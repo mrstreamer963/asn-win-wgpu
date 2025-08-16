@@ -6,7 +6,7 @@ mod log_utils;
 use std::{sync::Arc, time::Duration};
 
 use asn_logger::log::*;
-use asn_wgpu::wgpu;
+use asn_wgpu::wgpu::{self, Surface};
 use asn_winit::{
     WinitWindow,
     winit::{self, application::ApplicationHandler, event::WindowEvent, event_loop::ControlFlow},
@@ -51,7 +51,9 @@ struct Runner {
     state: Option<Arc<State>>,
 }
 
-struct State {}
+struct State {
+    surface: Surface<'static>,
+}
 
 async fn get_state(window: Arc<WinitWindow>) -> State {
     let size = window.inner_size();
@@ -129,7 +131,7 @@ async fn get_state(window: Arc<WinitWindow>) -> State {
 
     surface.configure(&device, &config);
 
-    State {}
+    State { surface }
 }
 
 impl ApplicationHandler for Runner {
@@ -160,6 +162,12 @@ impl ApplicationHandler for Runner {
         event: winit::event::WindowEvent,
     ) {
         match event {
+            WindowEvent::RedrawRequested => {
+                if self.window.is_some() {
+                    let w = self.window.as_ref().unwrap();
+                    w.request_redraw();
+                }
+            }
             WindowEvent::CloseRequested => {
                 trace!("CloseRequested event");
                 if self.window.is_some() {
