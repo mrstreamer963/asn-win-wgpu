@@ -46,8 +46,17 @@ fn run() {
 }
 
 struct Runner {
-    window: Option<Arc<WinitWindow>>,
     s: StateManager,
+    window: Option<Arc<WinitWindow>>,
+}
+
+impl Drop for StateManager {
+    fn drop(&mut self) {
+        trace!("StateManager drop");
+        if self.state.is_some() {
+            let _ = self.state.take();
+        }
+    }
 }
 
 struct StateManager {
