@@ -1,9 +1,0 @@
-[package]
-name = "asn-winit"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-winit = { version = "0.30" }
-asn-gui-core = { path = "../asn-gui-core" }
-asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", tag = "3.0.0" }
