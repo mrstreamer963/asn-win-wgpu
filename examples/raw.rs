@@ -6,7 +6,8 @@ mod log_utils;
 use std::{sync::Arc, time::Duration};
 
 use asn_logger::log::*;
-use asn_wgpu::wgpu::{self, Surface};
+use asn_wgpu::wgpu;
+
 use asn_winit::{
     WinitWindow,
     winit::{self, application::ApplicationHandler, event::WindowEvent, event_loop::ControlFlow},
@@ -52,7 +53,9 @@ struct Runner {
 }
 
 struct State {
-    surface: Surface<'static>,
+    surface: wgpu::Surface<'static>,
+    device: wgpu::Device,
+    queue: wgpu::Queue,
 }
 
 async fn get_state(window: Arc<WinitWindow>) -> State {
@@ -131,7 +134,11 @@ async fn get_state(window: Arc<WinitWindow>) -> State {
 
     surface.configure(&device, &config);
 
-    State { surface }
+    State {
+        surface,
+        device,
+        queue,
+    }
 }
 
 impl ApplicationHandler for Runner {
@@ -172,6 +179,9 @@ impl ApplicationHandler for Runner {
                 trace!("CloseRequested event");
                 if self.window.is_some() {
                     let _ = self.window.take();
+                }
+                if self.state.is_some() {
+                    let _ = self.state.take();
                 }
                 event_loop.exit();
             }
