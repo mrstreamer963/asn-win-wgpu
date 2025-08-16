@@ -1,11 +1,6 @@
 use std::sync::Arc;
 
-pub struct State {
-    pub window: Arc<winit::window::Window>,
-    pub surface: wgpu::Surface<'static>,
-    pub device: wgpu::Device,
-    pub queue: wgpu::Queue,
-}
+use crate::State;
 
 pub async fn get_state(window: Arc<winit::window::Window>) -> State {
     let size = window.inner_size();

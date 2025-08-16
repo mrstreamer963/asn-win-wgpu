@@ -5,9 +5,6 @@ use std::{
 
 use winit::{self, application::ApplicationHandler, event::WindowEvent, event_loop::ControlFlow};
 
-use crate::state_manager::get_state_manager;
-
-mod state_manager;
 mod wgpu_utils;
 
 async fn update() {
@@ -39,8 +36,21 @@ fn run() {
     result.unwrap();
 }
 
+pub struct State {
+    pub window: Arc<winit::window::Window>,
+    pub surface: wgpu::Surface<'static>,
+    pub device: wgpu::Device,
+    pub queue: wgpu::Queue,
+}
+
 struct Runner {
-    s: Option<Arc<Mutex<state_manager::StateManager>>>,
+    s: Option<Arc<Mutex<State>>>,
+}
+
+impl Drop for Runner {
+    fn drop(&mut self) {
+        println!("drop!");
+    }
 }
 
 impl ApplicationHandler for Runner {
@@ -59,11 +69,8 @@ impl ApplicationHandler for Runner {
             });
 
             let state = pollster::block_on(wgpu_utils::get_state(w.clone()));
-            let mut s = get_state_manager(w.clone());
-            s.set_state(state);
-
             print!("Runner get_state ok");
-            self.s = Some(Arc::new(Mutex::new(s)));
+            self.s = Some(Arc::new(Mutex::new(state)));
         }
     }
 
@@ -78,7 +85,7 @@ impl ApplicationHandler for Runner {
         match event {
             WindowEvent::RedrawRequested => {
                 if let Some(s) = &self.s {
-                    s.lock().unwrap().redraw();
+                    s.lock().unwrap().window.request_redraw();
                 }
                 println!("redraw request");
             }
@@ -86,7 +93,7 @@ impl ApplicationHandler for Runner {
                 println!("CloseRequested event");
                 if self.s.is_some() {
                     // без этой штуки закрытое окно не закрывается и зависает
-                    let _ = self.s.take();
+                    // let _ = self.s.take();
                 }
                 event_loop.exit();
             }
