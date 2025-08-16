@@ -10,20 +10,6 @@ use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
-impl<H> Drop for RenderManager<H>
-where
-    H: TAsnGuiHandler,
-{
-    fn drop(&mut self) {
-        m_trace!("RenderManager:drop ()");
-        if self.s.is_some() {
-            m_trace!("RenderManager:drop take()");
-            let _ = self.s.take();
-        }
-        m_trace!("RenderManager:drop end()");
-    }
-}
-
 impl<H> TAsnRenderManager for RenderManager<H>
 where
     H: TAsnGuiHandler<GraphContext = WgpuContext, FrameContext = WgpuFrameContext>,

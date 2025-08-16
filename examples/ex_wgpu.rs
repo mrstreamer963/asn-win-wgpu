@@ -68,8 +68,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         asn_winit::run(r)?;
     }
 
-    loop {
+    for i in 0..3 {
         pollster::block_on(update());
         std::thread::sleep(Duration::from_secs(1));
+        m_info!("i: {i}");
     }
+
+    Ok(())
 }

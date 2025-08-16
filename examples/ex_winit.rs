@@ -5,7 +5,7 @@ extern crate asn_winit;
 mod log_utils;
 use std::{sync::Arc, time::Duration};
 
-use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
+use asn_gui_core::TAsnRenderManager;
 use asn_logger::*;
 use asn_winit::WinitWindow;
 use log_utils::setup_log;
@@ -35,25 +35,6 @@ impl TAsnRenderManager for DummyRenderManager {
     }
 }
 
-impl TAsnGuiHandler for DummyGuiHandler {
-    type GraphContext = ();
-    type FrameContext = ();
-
-    fn init(&mut self, gcx: &Self::GraphContext) {
-        t_info!("TAsnGuiHandler", "init()");
-        let _ = gcx;
-    }
-
-    fn update(&mut self) {
-        t_info!("TAsnGuiHandler", "update()");
-    }
-
-    fn draw(&mut self, fcx: &Self::FrameContext) {
-        t_info!("TAsnGuiHandler", "draw()");
-        let _ = fcx;
-    }
-}
-
 async fn update() {
     m_info!("update");
 }
@@ -68,8 +49,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         asn_winit::run(r)?;
     }
 
-    loop {
+    for i in 0..3 {
         pollster::block_on(update());
         std::thread::sleep(Duration::from_secs(1));
+        m_info!("i: {i}");
     }
+
+    Ok(())
 }
