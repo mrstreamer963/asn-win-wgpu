@@ -88,15 +88,3 @@ pub async fn get_state(window: Arc<winit::window::Window>) -> State {
         _queue: queue,
     }
 }
-
-pub fn get_window(e: &winit::event_loop::ActiveEventLoop) -> winit::window::Window {
-                let window_attributes = winit::window::WindowAttributes::default()
-                .with_title("No title")
-                .with_inner_size(winit::dpi::LogicalSize::new(800, 600))
-                .with_resizable(true)
-                .with_decorations(true);
-
-            let w = e.create_window(window_attributes).unwrap();
-            
-            return w
-}
