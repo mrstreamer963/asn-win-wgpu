@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::data::LOG_MODULE_NAME;
 
 use super::RenderManager;
@@ -8,13 +10,27 @@ use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
+impl<H> Drop for RenderManager<H>
+where
+    H: TAsnGuiHandler,
+{
+    fn drop(&mut self) {
+        m_trace!("RenderManager:drop ()");
+        if self.s.is_some() {
+            m_trace!("RenderManager:drop take()");
+            let _ = self.s.take();
+        }
+        m_trace!("RenderManager:drop end()");
+    }
+}
+
 impl<H> TAsnRenderManager for RenderManager<H>
 where
     H: TAsnGuiHandler<GraphContext = WgpuContext, FrameContext = WgpuFrameContext>,
 {
     type Window = WinitWindow;
 
-    fn init(&mut self, w: std::sync::Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
+    fn init(&mut self, w: Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
         let context = match pollster::block_on(WgpuContext::new(w)) {
             Ok(context) => context,
             Err(e) => {
@@ -34,7 +50,7 @@ where
                     ))));
                 }
             };
-            h.init(&context)
+            // h.init(&context)
         }
 
         self.s = Some(context);
@@ -63,7 +79,7 @@ where
 
     fn draw(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // begin frame
-        let r = match self.s.as_mut() {
+        let _r = match self.s.as_mut() {
             Some(r) => r,
             None => {
                 return Err(Box::new(std::io::Error::other(format!(
@@ -72,29 +88,29 @@ where
             }
         };
 
-        let fcx = match WgpuFrameContext::new(&r.surface, &r.device) {
-            Ok(fcx) => fcx,
-            Err(e) => {
-                return Err(Box::new(std::io::Error::other(format!(
-                    "RenderManager:draw error - {e}"
-                ))));
-            }
-        };
+        // let fcx = match WgpuFrameContext::new(&r.surface, &r.device) {
+        //     Ok(fcx) => fcx,
+        //     Err(e) => {
+        //         return Err(Box::new(std::io::Error::other(format!(
+        //             "RenderManager:draw error - {e}"
+        //         ))));
+        //     }
+        // };
 
-        {
-            let mut h = match self.h.lock() {
-                Ok(h) => h,
-                Err(e) => {
-                    return Err(Box::new(std::io::Error::other(format!(
-                        "RenderManager:draw error - handler cant unlock - {e}"
-                    ))));
-                }
-            };
-            h.draw(&fcx)
-        }
+        // {
+        //     let mut h = match self.h.lock() {
+        //         Ok(h) => h,
+        //         Err(e) => {
+        //             return Err(Box::new(std::io::Error::other(format!(
+        //                 "RenderManager:draw error - handler cant unlock - {e}"
+        //             ))));
+        //         }
+        //     };
+        //     h.draw(&fcx)
+        // }
         // end frame
 
-        let _frame_duration = fcx.frame_start.elapsed();
+        // let _frame_duration = fcx.frame_start.elapsed();
 
         // Update render statistics
         // self.render_stats.frame_count += 1;
@@ -110,8 +126,8 @@ where
         //     &format!("Avg FPS: {:.1}, Frame time: {:?}", fps, avg_frame_time),
         // );
         // }
-        r.queue.submit(std::iter::once(fcx.encoder.finish()));
-        fcx.output.present();
+        // r.queue.submit(std::iter::once(fcx.encoder.finish()));
+        // fcx.output.present();
 
         Ok(())
     }

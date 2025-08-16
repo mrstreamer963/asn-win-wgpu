@@ -5,7 +5,10 @@ extern crate asn_winit;
 
 mod log_utils;
 
-use std::sync::{Arc, Mutex};
+use std::{
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 
 use asn_logger::*;
 use log_utils::setup_log;
@@ -46,18 +49,27 @@ mod dummy_gui {
     }
 }
 
-async fn update() {}
+async fn update() {
+    m_info!("update");
+}
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
 
     m_info!("hello from main()");
 
-    let h = dummy_gui::get_handler();
+    {
+        let h = dummy_gui::get_handler();
 
-    let h_safe = Arc::new(Mutex::new(h));
+        let h_safe = Arc::new(Mutex::new(h));
 
-    let r = asn_wgpu::get_manager(h_safe);
+        let r = asn_wgpu::get_manager(h_safe);
 
-    asn_winit::run(r)
+        asn_winit::run(r)?;
+    }
+
+    loop {
+        pollster::block_on(update());
+        std::thread::sleep(Duration::from_secs(1));
+    }
 }

@@ -3,7 +3,7 @@ extern crate asn_logger;
 extern crate asn_winit;
 
 mod log_utils;
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
 use asn_logger::*;
@@ -54,12 +54,22 @@ impl TAsnGuiHandler for DummyGuiHandler {
     }
 }
 
+async fn update() {
+    m_info!("update");
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     setup_log();
 
     m_info!("hello from main()");
 
-    let r = DummyRenderManager {};
+    {
+        let r = DummyRenderManager {};
+        asn_winit::run(r)?;
+    }
 
-    asn_winit::run(r)
+    loop {
+        pollster::block_on(update());
+        std::thread::sleep(Duration::from_secs(1));
+    }
 }
