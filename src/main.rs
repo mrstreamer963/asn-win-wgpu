@@ -14,16 +14,11 @@ use winit::{
 mod wgpu_utils;
 use wgpu_utils::get_window;
 
-async fn update() {
-    println!("update");
-}
-
 fn main() {
     run();
 
-    for i in 0..3 {
-        pollster::block_on(update());
-        std::thread::sleep(Duration::from_secs(1));
+    for i in 0..3000000 {
+        // std::thread::sleep(Duration::from_secs(1));
         println!("i: {i}");
     }
 
@@ -35,9 +30,7 @@ fn run() {
         .map_err(|e| format!("Failed to create event loop: {e}"))
         .unwrap();
 
-    // let s = state_manager::get_state_manager();
     let mut runner = Runner { s: None };
-
     event_loop.set_control_flow(ControlFlow::Poll);
     event_loop.run_app(&mut runner).unwrap();
 }
@@ -92,7 +85,7 @@ impl ApplicationHandler for Runner {
                 println!("CloseRequested event");
                 if self.s.is_some() {
                     // без этой штуки закрытое окно не закрывается и зависает
-                    // let _ = self.s.take();
+                    let _ = self.s.take();
                 }
                 event_loop.exit();
             }
