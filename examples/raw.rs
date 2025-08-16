@@ -37,10 +37,8 @@ fn run() {
         .map_err(|e| format!("Failed to create event loop: {e}"))
         .unwrap();
 
-    let mut runner = Runner {
-        window: None,
-        state: None,
-    };
+    let s = StateManager { state: None };
+    let mut runner = Runner { window: None, s };
 
     event_loop.set_control_flow(ControlFlow::Poll);
     let result = event_loop.run_app(&mut runner);
@@ -49,7 +47,18 @@ fn run() {
 
 struct Runner {
     window: Option<Arc<WinitWindow>>,
-    state: Option<Arc<State>>,
+    s: StateManager,
+}
+
+struct StateManager {
+    state: Option<State>,
+}
+
+impl StateManager {
+    fn init(&mut self, w: Arc<WinitWindow>) {
+        let s = pollster::block_on(get_state(w.clone()));
+        self.state = Some(s);
+    }
 }
 
 struct State {
@@ -154,11 +163,10 @@ impl ApplicationHandler for Runner {
             let w = event_loop.create_window(window_attributes).unwrap();
             let arc_w = Arc::new(w);
 
-            let s = pollster::block_on(get_state(arc_w.clone()));
-            let arc_s = Arc::new(s);
+            self.s.init(arc_w.clone());
 
+            // let s = pollster::block_on(get_state(arc_w.clone()));
             self.window = Some(arc_w);
-            self.state = Some(arc_s);
         }
     }
 
@@ -179,9 +187,6 @@ impl ApplicationHandler for Runner {
                 trace!("CloseRequested event");
                 if self.window.is_some() {
                     let _ = self.window.take();
-                }
-                if self.state.is_some() {
-                    let _ = self.state.take();
                 }
                 event_loop.exit();
             }
