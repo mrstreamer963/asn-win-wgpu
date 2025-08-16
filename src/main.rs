@@ -1,6 +1,11 @@
-use std::{sync::Arc, time::Duration};
+use std::{
+    sync::{Arc, Mutex},
+    time::Duration,
+};
 
 use winit::{self, application::ApplicationHandler, event::WindowEvent, event_loop::ControlFlow};
+
+use crate::state_manager::get_state_manager;
 
 mod state_manager;
 mod wgpu_utils;
@@ -26,8 +31,8 @@ fn run() {
         .map_err(|e| format!("Failed to create event loop: {e}"))
         .unwrap();
 
-    let s = state_manager::get_state_manager();
-    let mut runner = Runner { window: None, s };
+    // let s = state_manager::get_state_manager();
+    let mut runner = Runner { s: None };
 
     event_loop.set_control_flow(ControlFlow::Poll);
     let result = event_loop.run_app(&mut runner);
@@ -35,14 +40,13 @@ fn run() {
 }
 
 struct Runner {
-    s: state_manager::StateManager,
-    window: Option<Arc<winit::window::Window>>,
+    s: Option<Arc<Mutex<state_manager::StateManager>>>,
 }
 
 impl ApplicationHandler for Runner {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         println!("resumed!");
-        if self.window.is_none() {
+        if self.s.is_none() {
             let w = Arc::new({
                 let window_attributes = winit::window::WindowAttributes::default()
                     .with_title("No title")
@@ -55,10 +59,11 @@ impl ApplicationHandler for Runner {
             });
 
             let state = pollster::block_on(wgpu_utils::get_state(w.clone()));
+            let mut s = get_state_manager(w.clone());
+            s.set_state(state);
 
             print!("Runner get_state ok");
-            self.s.set_state(state);
-            self.window = Some(w.clone());
+            self.s = Some(Arc::new(Mutex::new(s)));
         }
     }
 
@@ -72,17 +77,16 @@ impl ApplicationHandler for Runner {
 
         match event {
             WindowEvent::RedrawRequested => {
-                if self.window.is_some() {
-                    let w = self.window.as_ref().unwrap();
-                    println!("redraw request");
-                    w.request_redraw();
-                    println!("redraw request Ok");
+                if let Some(s) = &self.s {
+                    s.lock().unwrap().redraw();
                 }
+                println!("redraw request");
             }
             WindowEvent::CloseRequested => {
                 println!("CloseRequested event");
-                if self.window.is_some() {
-                    let _ = self.window.take();
+                if self.s.is_some() {
+                    // без этой штуки закрытое окно не закрывается и зависает
+                    let _ = self.s.take();
                 }
                 event_loop.exit();
             }
