@@ -11,6 +11,7 @@ use render_manager::RenderManager;
 mod data;
 
 pub use state_error::StateError;
+pub use wgpu;
 
 pub type GraphContext = render_manager::WgpuContext;
 pub type FrameContext = render_manager::WgpuFrameContext;
