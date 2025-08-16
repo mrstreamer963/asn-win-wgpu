@@ -1,6 +1,4 @@
-use std::sync::Arc;
-
-use crate::wgpu_utils::{get_state, State};
+use crate::wgpu_utils::{State};
 
 pub struct StateManager {
     state: Option<State>,
@@ -15,14 +13,7 @@ impl Drop for StateManager {
     }
 }
 
-
 impl StateManager {
-    pub fn init(&mut self, w: Arc<winit::window::Window>) {
-        let s = pollster::block_on(get_state(w.clone()));
-        self.set_state(s);
-    }
-
-
     pub fn set_state(&mut self, s: State) {
         self.state = Some(s);
     }
