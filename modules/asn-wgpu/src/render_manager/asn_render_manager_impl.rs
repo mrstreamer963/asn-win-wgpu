@@ -10,6 +10,18 @@ use asn_gui_core::{TAsnGuiHandler, TAsnRenderManager};
 use asn_logger::*;
 use asn_winit::WinitWindow;
 
+impl<H> Drop for RenderManager<H>
+where
+    H: TAsnGuiHandler,
+{
+    fn drop(&mut self) {
+        m_info!("RenderManager Drop:drop()");
+        if self.s.is_some() {
+            // let _ = self.s.take();
+        }
+    }
+}
+
 impl<H> TAsnRenderManager for RenderManager<H>
 where
     H: TAsnGuiHandler<GraphContext = WgpuContext, FrameContext = WgpuFrameContext>,
@@ -17,15 +29,15 @@ where
     type Window = WinitWindow;
 
     fn init(&mut self, w: Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
-        // let context = match pollster::block_on(WgpuContext::new(w)) {
-        //     Ok(context) => context,
-        //     Err(e) => {
-        //         m_error!("Failed to create GPU state: {e}");
-        //         return Err(Box::new(std::io::Error::other(format!(
-        //             "RenderManager:init error: {e}"
-        //         ))));
-        //     }
-        // };
+        let context = match pollster::block_on(WgpuContext::new(w)) {
+            Ok(context) => context,
+            Err(e) => {
+                m_error!("Failed to create GPU state: {e}");
+                return Err(Box::new(std::io::Error::other(format!(
+                    "RenderManager:init error: {e}"
+                ))));
+            }
+        };
 
         {
             // let mut h = match self.h.lock() {
@@ -39,7 +51,7 @@ where
             // h.init(&context)
         }
 
-        // self.s = Some(context);
+        self.s = Some(context);
 
         Ok(())
     }
