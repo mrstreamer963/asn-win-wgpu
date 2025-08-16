@@ -1,0 +1,85 @@
+extern crate asn_logger;
+extern crate asn_win_wgpu;
+
+mod log_utils;
+
+use std::{sync::Arc, time::Duration};
+
+use asn_logger::log::*;
+use asn_winit::{
+    WinitWindow,
+    winit::{self, application::ApplicationHandler, event::WindowEvent, event_loop::ControlFlow},
+};
+use log_utils::setup_log;
+
+async fn update() {
+    info!("update");
+}
+
+fn main() {
+    setup_log();
+
+    run();
+
+    for i in 0..3 {
+        pollster::block_on(update());
+        std::thread::sleep(Duration::from_secs(1));
+        info!("i: {i}");
+    }
+
+    trace!("ok!");
+}
+
+fn run() {
+    let event_loop = winit::event_loop::EventLoop::new()
+        .map_err(|e| format!("Failed to create event loop: {e}"))
+        .unwrap();
+
+    let mut runner = Runner { window: None };
+
+    event_loop.set_control_flow(ControlFlow::Poll);
+    let result = event_loop.run_app(&mut runner);
+    result.unwrap();
+}
+
+struct Runner {
+    window: Option<Arc<WinitWindow>>,
+}
+
+impl ApplicationHandler for Runner {
+    fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+        trace!("resumed!");
+        if self.window.is_none() {
+            let window_attributes = winit::window::WindowAttributes::default()
+                .with_title("No title")
+                .with_inner_size(winit::dpi::LogicalSize::new(800, 600))
+                .with_resizable(true)
+                .with_decorations(true);
+
+            let w = event_loop.create_window(window_attributes).unwrap();
+            let arc_w = Arc::new(w);
+
+            self.window = Some(arc_w);
+        }
+    }
+
+    fn window_event(
+        &mut self,
+        event_loop: &winit::event_loop::ActiveEventLoop,
+        window_id: winit::window::WindowId,
+        event: winit::event::WindowEvent,
+    ) {
+        match event {
+            WindowEvent::CloseRequested => {
+                trace!("CloseRequested event");
+                if self.window.is_some() {
+                    let _ = self.window.take();
+                }
+                event_loop.exit();
+            }
+            _ => {
+                trace!("window_event!");
+            }
+        }
+    }
+}

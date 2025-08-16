@@ -12,7 +12,7 @@ pub struct WgpuContext {
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     pub surface_format: wgpu::TextureFormat,
-    pub surface: wgpu::Surface<'static>,
+    // pub surface: wgpu::Surface<'static>,
     pub config: wgpu::SurfaceConfiguration,
 }
 
@@ -109,7 +109,7 @@ impl WgpuContext {
             device,
             queue,
             surface_format,
-            surface,
+            // surface,
             config,
         };
 
@@ -128,7 +128,7 @@ impl WgpuContext {
 
         self.config.width = width;
         self.config.height = height;
-        self.surface.configure(&self.device, &self.config);
+        // self.surface.configure(&self.device, &self.config);
 
         Ok(())
     }
