@@ -3,8 +3,13 @@ use std::sync::Arc;
 use crate::wgpu_utils::State;
 
 pub struct StateManager {
-    window: Arc<winit::window::Window>,
     state: Option<State>,
+}
+
+impl Drop for StateManager {
+    fn drop(&mut self) {
+        println!("StateManager Drop()")
+    }
 }
 
 impl StateManager {
@@ -13,15 +18,15 @@ impl StateManager {
         self.state = Some(s);
     }
     pub fn redraw(&mut self) {
-        self.window.request_redraw();
+        if let Some(state) = &self.state {
+            state.window.request_redraw();
+        }
+
         println!("StateManager redraw()");
     }
 }
 
 pub fn get_state_manager(w: Arc<winit::window::Window>) -> StateManager {
     println!("StateManager new()");
-    StateManager {
-        state: None,
-        window: w,
-    }
+    StateManager { state: None }
 }

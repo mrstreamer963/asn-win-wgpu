@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 pub struct State {
+    pub window: Arc<winit::window::Window>,
     pub surface: wgpu::Surface<'static>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
@@ -86,5 +87,6 @@ pub async fn get_state(window: Arc<winit::window::Window>) -> State {
         surface,
         device,
         queue,
+        window,
     }
 }
