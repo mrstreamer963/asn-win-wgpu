@@ -75,6 +75,9 @@ where
     /// Handles application close
     fn handle_close(&mut self, event_loop: &ActiveEventLoop) {
         m_info!("Application close requested");
+        if self.window.is_some() {
+            let _ = self.window.take();
+        }
         event_loop.exit();
     }
 

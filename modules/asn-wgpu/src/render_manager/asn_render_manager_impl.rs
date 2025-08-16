@@ -17,29 +17,29 @@ where
     type Window = WinitWindow;
 
     fn init(&mut self, w: Arc<Self::Window>) -> Result<(), Box<dyn std::error::Error>> {
-        let context = match pollster::block_on(WgpuContext::new(w)) {
-            Ok(context) => context,
-            Err(e) => {
-                m_error!("Failed to create GPU state: {e}");
-                return Err(Box::new(std::io::Error::other(format!(
-                    "RenderManager:init error: {e}"
-                ))));
-            }
-        };
+        // let context = match pollster::block_on(WgpuContext::new(w)) {
+        //     Ok(context) => context,
+        //     Err(e) => {
+        //         m_error!("Failed to create GPU state: {e}");
+        //         return Err(Box::new(std::io::Error::other(format!(
+        //             "RenderManager:init error: {e}"
+        //         ))));
+        //     }
+        // };
 
         {
-            let mut h = match self.h.lock() {
-                Ok(h) => h,
-                Err(e) => {
-                    return Err(Box::new(std::io::Error::other(format!(
-                        "RenderManager:draw error - handler cant unlock - {e}"
-                    ))));
-                }
-            };
+            // let mut h = match self.h.lock() {
+            //     Ok(h) => h,
+            //     Err(e) => {
+            //         return Err(Box::new(std::io::Error::other(format!(
+            //             "RenderManager:draw error - handler cant unlock - {e}"
+            //         ))));
+            //     }
+            // };
             // h.init(&context)
         }
 
-        self.s = Some(context);
+        // self.s = Some(context);
 
         Ok(())
     }
@@ -65,14 +65,14 @@ where
 
     fn draw(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // begin frame
-        let _r = match self.s.as_mut() {
-            Some(r) => r,
-            None => {
-                return Err(Box::new(std::io::Error::other(format!(
-                    "RenderManager:draw error - manager not initialized"
-                ))));
-            }
-        };
+        // let r = match self.s.as_mut() {
+        //     Some(r) => r,
+        //     None => {
+        //         return Err(Box::new(std::io::Error::other(format!(
+        //             "RenderManager:draw error - manager not initialized"
+        //         ))));
+        //     }
+        // };
 
         // let fcx = match WgpuFrameContext::new(&r.surface, &r.device) {
         //     Ok(fcx) => fcx,
