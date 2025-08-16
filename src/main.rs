@@ -5,6 +5,8 @@ use std::{
 
 use winit::{self, application::ApplicationHandler, event::WindowEvent, event_loop::ControlFlow};
 
+use crate::wgpu_utils::get_window;
+
 mod wgpu_utils;
 
 async fn update() {
@@ -49,7 +51,7 @@ struct Runner {
 
 impl Drop for Runner {
     fn drop(&mut self) {
-        println!("drop!");
+        println!("Runner drop()");
     }
 }
 
@@ -57,19 +59,12 @@ impl ApplicationHandler for Runner {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         println!("resumed!");
         if self.s.is_none() {
-            let w = Arc::new({
-                let window_attributes = winit::window::WindowAttributes::default()
-                    .with_title("No title")
-                    .with_inner_size(winit::dpi::LogicalSize::new(800, 600))
-                    .with_resizable(true)
-                    .with_decorations(true);
-
-                let w = event_loop.create_window(window_attributes).unwrap();
-                w
-            });
+            let w = Arc::new(get_window(event_loop));
+            println!("Runner get_window ok");
 
             let state = pollster::block_on(wgpu_utils::get_state(w.clone()));
-            print!("Runner get_state ok");
+            println!("Runner get_state ok");
+
             self.s = Some(Arc::new(Mutex::new(state)));
         }
     }
@@ -87,7 +82,7 @@ impl ApplicationHandler for Runner {
                 if let Some(s) = &self.s {
                     s.lock().unwrap().window.request_redraw();
                 }
-                println!("redraw request");
+                // println!("redraw request");
             }
             WindowEvent::CloseRequested => {
                 println!("CloseRequested event");
