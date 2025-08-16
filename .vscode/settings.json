@@ -1,0 +1,39 @@
+{
+  "editor.folding": true,
+  "editor.foldingStrategy": "auto",
+  "editor.showFoldingControls": "always",
+  "editor.foldingMaximumRegions": 5000,
+  
+  "[rust]": {
+    "editor.folding": true,
+    "editor.foldingStrategy": "indentation",
+    "editor.showFoldingControls": "always",
+    "editor.foldingImportsByDefault": true,
+    "editor.foldingMaximumRegions": 10000,
+    "editor.wordWrap": "off",
+    "editor.rulers": [100],
+    "editor.formatOnSave": true
+  },
+  
+  "rust-analyzer.folding": {
+    "enabled": true,
+    "imports": true,
+    "comments": true,
+    "docComments": true
+  },
+  
+  "rust-analyzer.assist.emitMustUse": true,
+  "rust-analyzer.checkOnSave": true,
+  "rust-analyzer.checkOnSave.command": "clippy",
+  "rust-analyzer.cargo.buildScripts.enable": true,
+  "rust-analyzer.lens.enable": false,
+  "rust-analyzer.lens.implementations.enable": true,
+  "rust-analyzer.lens.references.adt.enable": true,
+  "rust-analyzer.lens.references.trait.enable": true,
+  "rust-analyzer.lens.references.method.enable": true,
+  "rust-analyzer.lens.references.enumVariant.enable": true,
+  "rust-analyzer.lens.references.field.enable": true,
+  "rust-analyzer.lens.references.constant.enable": true,
+  "rust-analyzer.lens.references.static.enable": true,
+  "rust-analyzer.lens.references.macro.enable": true
+} 

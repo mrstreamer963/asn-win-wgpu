@@ -1,4 +1,4 @@
-use crate::wgpu_utils::{State};
+use crate::wgpu_utils::State;
 
 pub struct StateManager {
     state: Option<State>,
@@ -19,6 +19,6 @@ impl StateManager {
     }
 }
 
-pub fn get_state_manager () -> StateManager{
+pub fn get_state_manager() -> StateManager {
     StateManager { state: None }
 }
