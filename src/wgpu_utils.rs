@@ -1,8 +1,13 @@
 use std::sync::Arc;
 
+use winit::{
+    event_loop::ActiveEventLoop,
+    window::{Window, WindowAttributes},
+};
+
 use crate::State;
 
-pub async fn get_state(window: Arc<winit::window::Window>) -> State {
+pub async fn get_state(window: Arc<Window>) -> State {
     let size = window.inner_size();
     println!("window size: {size:?}");
 
@@ -86,8 +91,8 @@ pub async fn get_state(window: Arc<winit::window::Window>) -> State {
     }
 }
 
-pub fn get_window(event_loop: &winit::event_loop::ActiveEventLoop) -> winit::window::Window {
-    let window_attributes = winit::window::WindowAttributes::default()
+pub fn get_window(event_loop: &ActiveEventLoop) -> Window {
+    let window_attributes = WindowAttributes::default()
         .with_title("No title")
         .with_inner_size(winit::dpi::LogicalSize::new(800, 600))
         .with_resizable(true)

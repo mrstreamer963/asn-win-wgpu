@@ -3,11 +3,16 @@ use std::{
     time::Duration,
 };
 
-use winit::{self, application::ApplicationHandler, event::WindowEvent, event_loop::ControlFlow};
-
-use crate::wgpu_utils::get_window;
+use winit::{
+    self,
+    application::ApplicationHandler,
+    event::WindowEvent,
+    event_loop::{ActiveEventLoop, ControlFlow, EventLoop},
+    window::{Window, WindowId},
+};
 
 mod wgpu_utils;
+use wgpu_utils::get_window;
 
 async fn update() {
     println!("update");
@@ -26,7 +31,7 @@ fn main() {
 }
 
 fn run() {
-    let event_loop = winit::event_loop::EventLoop::new()
+    let event_loop = EventLoop::new()
         .map_err(|e| format!("Failed to create event loop: {e}"))
         .unwrap();
 
@@ -34,12 +39,11 @@ fn run() {
     let mut runner = Runner { s: None };
 
     event_loop.set_control_flow(ControlFlow::Poll);
-    let result = event_loop.run_app(&mut runner);
-    result.unwrap();
+    event_loop.run_app(&mut runner).unwrap();
 }
 
 pub struct State {
-    pub window: Arc<winit::window::Window>,
+    pub window: Arc<Window>,
     pub surface: wgpu::Surface<'static>,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
@@ -56,7 +60,7 @@ impl Drop for Runner {
 }
 
 impl ApplicationHandler for Runner {
-    fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+    fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         println!("resumed!");
         if self.s.is_none() {
             let w = Arc::new(get_window(event_loop));
@@ -71,9 +75,9 @@ impl ApplicationHandler for Runner {
 
     fn window_event(
         &mut self,
-        event_loop: &winit::event_loop::ActiveEventLoop,
-        window_id: winit::window::WindowId,
-        event: winit::event::WindowEvent,
+        event_loop: &ActiveEventLoop,
+        window_id: WindowId,
+        event: WindowEvent,
     ) {
         let _ = window_id;
 
@@ -93,7 +97,7 @@ impl ApplicationHandler for Runner {
                 event_loop.exit();
             }
             _ => {
-                // trace!("window_event!");
+                println!("window_event! {:?}", event);
             }
         }
     }
