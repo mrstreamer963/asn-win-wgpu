@@ -64,7 +64,10 @@ impl ApplicationHandler for DemoApp {
                 println!("Window title: {}", window.title());
                 println!("Demo resource: {:?}", resource);
             }
-            WindowEvent::CloseRequested => event_loop.exit(),
+            WindowEvent::CloseRequested => {
+                *self = Self::Loading;
+                event_loop.exit()
+            }
             _ => {}
         }
     }
