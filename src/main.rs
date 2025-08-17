@@ -15,17 +15,6 @@ mod wgpu_utils;
 use wgpu_utils::get_window;
 
 fn main() {
-    run();
-
-    for i in 0..3000000 {
-        // std::thread::sleep(Duration::from_secs(1));
-        println!("i: {i}");
-    }
-
-    println!("ok!");
-}
-
-fn run() {
     let event_loop = EventLoop::new()
         .map_err(|e| format!("Failed to create event loop: {e}"))
         .unwrap();
@@ -33,6 +22,12 @@ fn run() {
     let mut runner = Runner { s: None };
     event_loop.set_control_flow(ControlFlow::Poll);
     event_loop.run_app(&mut runner).unwrap();
+
+    println!("event_loop.run_app ended");
+
+    std::thread::sleep(Duration::from_secs(3));
+
+    println!("main ok");
 }
 
 pub struct State {
@@ -77,17 +72,20 @@ impl ApplicationHandler for Runner {
         match event {
             WindowEvent::RedrawRequested => {
                 if let Some(s) = &self.s {
+                    // println!("redraw request");
                     s.lock().unwrap().window.request_redraw();
                 }
-                // println!("redraw request");
             }
             WindowEvent::CloseRequested => {
                 println!("CloseRequested event");
                 if self.s.is_some() {
                     // без этой штуки закрытое окно не закрывается и зависает
-                    let _ = self.s.take();
+                    // let _ = self.s.take();
                 }
                 event_loop.exit();
+            }
+            WindowEvent::Destroyed => {
+                println!("Destroyed event");
             }
             _ => {
                 println!("window_event! {:?}", event);
