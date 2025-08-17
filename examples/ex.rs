@@ -1,5 +1,6 @@
 // https://gist.github.com/mrstreamer963/85ab238fd42b7a2077a22d179e1d1c54#file-main-rs-L82
 
+use std::io::{self, Write};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -22,15 +23,21 @@ enum DemoApp {
 fn main() {
     let event_loop = EventLoop::new().unwrap();
 
-    let mut app = DemoApp::Loading;
+    let mut app: DemoApp = DemoApp::Loading;
 
     event_loop.run_app(&mut app).unwrap();
 
     println!("event_loop.run_app ended");
 
-    std::thread::sleep(Duration::from_secs(3));
+    print!("Please wait 3 sec");
 
-    println!("main ok");
+    for _ in 0..3 {
+        print!(".");
+        io::stdout().flush().unwrap();
+        std::thread::sleep(Duration::from_secs(1));
+    }
+
+    println!("[ok]");
 }
 
 impl ApplicationHandler for DemoApp {
