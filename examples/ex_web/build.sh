@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ASN Web Example Build Script
-# This script builds the ex_web example for web using wasm-pack
+# This script builds the ex_web example for web using trunk
 
 set -e
 
@@ -12,7 +12,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🚀 Building ASN Web Example...${NC}"
+echo -e "${BLUE}🚀 Building ASN Web Example with Trunk...${NC}"
 
 # Check if we're in the right directory
 if [ ! -f "Cargo.toml" ]; then
@@ -20,12 +20,12 @@ if [ ! -f "Cargo.toml" ]; then
     exit 1
 fi
 
-# Check if wasm-pack is installed
-if ! command -v wasm-pack &> /dev/null; then
-    echo -e "${YELLOW}⚠️  wasm-pack is not installed. Installing...${NC}"
-    cargo install wasm-pack
+# Check if trunk is installed
+if ! command -v trunk &> /dev/null; then
+    echo -e "${YELLOW}⚠️  trunk is not installed. Installing...${NC}"
+    cargo install trunk
     if [ $? -ne 0 ]; then
-        echo -e "${RED}❌ Failed to install wasm-pack${NC}"
+        echo -e "${RED}❌ Failed to install trunk${NC}"
         exit 1
     fi
 fi
@@ -43,33 +43,34 @@ if [ "$1" = "--clean" ]; then
     echo -e "${BLUE}🧹 Cleaning previous builds...${NC}"
     rm -rf target/wasm32-unknown-unknown
     rm -rf pkg
+    rm -rf dist
 fi
 
-# Build for wasm32-unknown-unknown target
-echo -e "${BLUE}🔨 Building for WASM target...${NC}"
+# Build with trunk
+echo -e "${BLUE}🔨 Building with Trunk...${NC}"
 echo -e "${YELLOW}   This may take a few minutes on first build...${NC}"
 
 # Build with progress
-if wasm-pack build --target web --out-dir pkg; then
+if trunk build; then
     echo -e "${GREEN}✅ Build completed successfully!${NC}"
     
-    # Check if pkg directory was created
-    if [ -d "pkg" ]; then
-        echo -e "${GREEN}📦 WASM package created in ./pkg/${NC}"
+    # Check if dist directory was created
+    if [ -d "dist" ]; then
+        echo -e "${GREEN}📦 Web package created in ./dist/${NC}"
         
         # Show package size
         if command -v du &> /dev/null; then
-            PKG_SIZE=$(du -sh pkg 2>/dev/null | cut -f1)
-            echo -e "${BLUE}📊 Package size: ${PKG_SIZE}${NC}"
+            DIST_SIZE=$(du -sh dist 2>/dev/null | cut -f1)
+            echo -e "${BLUE}📊 Package size: ${DIST_SIZE}${NC}"
         fi
     else
-        echo -e "${RED}❌ Warning: pkg directory was not created${NC}"
+        echo -e "${RED}❌ Warning: dist directory was not created${NC}"
     fi
     
     echo ""
     echo -e "${GREEN}🌐 To run the web example:${NC}"
     echo -e "   ${BLUE}./run.sh${NC}"
-    echo -e "   ${BLUE}Or manually: python3 -m http.server 8091${NC}"
+    echo -e "   ${BLUE}Or manually: trunk serve${NC}"
     echo -e "   ${BLUE}Then open http://localhost:8091 in your browser${NC}"
     
 else

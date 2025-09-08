@@ -85,15 +85,13 @@ where
 
     fn draw(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // Проверяем, что менеджер инициализирован
-        if self.s.is_none() {
-            return Err(render_error("manager not initialized"));
-        }
-
-        // Получаем графический контекст
-        let r = self.s.as_ref().unwrap();
+        let s = self
+            .s
+            .as_ref()
+            .ok_or_else(|| render_error("manager not initialized"))?;
 
         // Создаем контекст кадра
-        let mut fcx = WgpuFrameContext::new(&r.surface, &r.device)
+        let mut fcx = WgpuFrameContext::new(&s.surface, &s.device)
             .map_err(|e| render_error(&format!("draw error - {e}")))?;
 
         // Обновляем и отрисовываем GUI
@@ -103,7 +101,7 @@ where
         }
 
         // Отправляем команды рендеринга и выводим кадр на экран
-        r.queue.submit(std::iter::once(fcx.encoder.finish()));
+        s.queue.submit(std::iter::once(fcx.encoder.finish()));
         fcx.output.present();
 
         // Обновляем статистику рендеринга
@@ -128,15 +126,18 @@ where
 
     fn update(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // Получаем графический контекст
-        let r = self.s.as_ref().unwrap();
+        let s = self
+            .s
+            .as_ref()
+            .ok_or_else(|| render_error("manager not initialized"))?;
 
         {
             let mut h = lock_handler(&self.h)?;
-            h.update(r);
+            h.update(s);
         }
 
         // Запрашиваем перерисовку окна
-        r.window.request_redraw();
+        s.window.request_redraw();
 
         Ok(())
     }

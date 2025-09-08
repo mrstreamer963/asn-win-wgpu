@@ -29,13 +29,22 @@ else
     echo -e "${YELLOW}ℹ️  Target directory not found${NC}"
 fi
 
-# Clean pkg directory (WASM build output)
+# Clean pkg directory (WASM build output from wasm-pack)
 if [ -d "pkg" ]; then
     echo -e "${YELLOW}🗑️  Removing pkg directory...${NC}"
     rm -rf pkg
     echo -e "${GREEN}✅ Pkg directory removed${NC}"
 else
     echo -e "${YELLOW}ℹ️  Pkg directory not found${NC}"
+fi
+
+# Clean dist directory (Web build output from trunk)
+if [ -d "dist" ]; then
+    echo -e "${YELLOW}🗑️  Removing dist directory...${NC}"
+    rm -rf dist
+    echo -e "${GREEN}✅ Dist directory removed${NC}"
+else
+    echo -e "${YELLOW}ℹ️  Dist directory not found${NC}"
 fi
 
 # Clean cargo cache for this project
@@ -64,6 +73,7 @@ echo -e "${GREEN}✅ Cleaning completed successfully!${NC}"
 echo -e "${BLUE}📊 Summary:${NC}"
 echo -e "  - Removed target directory (if existed)"
 echo -e "  - Removed pkg directory (if existed)"
+echo -e "  - Removed dist directory (if existed)"
 echo -e "  - Cleaned cargo cache"
 echo -e "  - Removed temporary files"
 echo -e "  - Removed log files (if existed)"
