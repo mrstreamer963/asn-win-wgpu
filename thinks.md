@@ -7,9 +7,6 @@ asn-winit -> asn-wgpu -> [wgpu-handler]draw(wgpu_context)
 [asn-winit] -> [asn-wgpu]
             -> [wgpu-handler]
 
-
-Сделать run и run_web двумя разными функциями модуля (!)
-
 // как заполнять gui-компоненты до вызова init ?
 // State -> Loaded/Unloaded
 // Option -> Option<Element>
@@ -18,7 +15,6 @@ asn-winit -> asn-wgpu -> [wgpu-handler]draw(wgpu_context)
 
 Бесплатную музыку и звуки можно взять отсюда:
 https://zvukogram.com/zvuk/88634/
-
 
 
 Event handler -> (?)
