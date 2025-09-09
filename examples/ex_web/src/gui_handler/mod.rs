@@ -2,7 +2,6 @@ use asn_logger::*;
 pub const LOG_MODULE_NAME: &str = "DummyGuiHandler";
 
 mod gui_handler_state;
-mod map_utils;
 mod time;
 use asn_gui_core::{TAsnGuiElement, TAsnGuiHandler};
 use asn_wgpu::{WgpuGuiHandler, render_manager};

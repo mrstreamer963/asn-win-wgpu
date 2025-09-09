@@ -1,17 +1,13 @@
+use crate::gui_handler::time::Instant;
 use asn_core::cgmath::Vector3;
 use asn_core::transform_set::TransformSet;
 use asn_wgpu::WgpuGraphContext;
 use wgpu_map::{MapParams, MapTilesParams, WgpuMap};
 
-use crate::gui_handler::map_utils::generate_random_map;
-use crate::gui_handler::time::Instant;
-
 pub const LOOP_MILLIS: u128 = 16;
 
 pub struct GuiHandlerState {
     pub m: WgpuMap,
-    pub map_width: u32,
-    pub map_height: u32,
     pub tiles_width: u32,
     pub tiles_height: u32,
     pub last_update: Instant,
@@ -23,18 +19,18 @@ impl GuiHandlerState {
         if now.duration_since(self.last_update).as_millis() >= LOOP_MILLIS as u128 {
             self.last_update = now;
 
-            let map = generate_random_map(
-                self.map_width,
-                self.map_height,
-                self.tiles_width * self.tiles_height - 1,
-            );
-            self.m.update_map(&map);
+            // let map = generate_random_map(
+            //     self.map_width,
+            //     self.map_height,
+            //     self.tiles_width * self.tiles_height - 1,
+            // );
+            // self.m.update_map(&map);
             // Здесь может быть дополнительная логика обновления, если она есть
         }
     }
 }
 
-pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
+pub fn new_handler_state(gcx: &WgpuGraphContext, map_params: &MapParams) -> GuiHandlerState {
     // let map_tiles_bytes = include_bytes!("../../../tiles_64_95.png");
     // let tiles_width = 64;
     // let tiles_height = 95;
@@ -49,15 +45,15 @@ pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
         tiles_height,
     };
 
-    let map_width = 32;
-    let map_height = 32;
-    let map = generate_random_map(map_width, map_height, map_width * map_height - 1);
+    // let map_width = 32;
+    // let map_height = 32;
+    // let map = generate_random_map(map_width, map_height, map_width * map_height - 1);
 
-    let map_params = MapParams {
-        map_width,
-        map_height,
-        tile_indices: &map,
-    };
+    // let map_params = MapParams {
+    //     map_width,
+    //     map_height,
+    //     tile_indices: &map,
+    // };
 
     let m = wgpu_map::get_map(gcx, &tiles_params, &map_params);
 
@@ -85,8 +81,6 @@ pub fn new_handler_state(gcx: &WgpuGraphContext) -> GuiHandlerState {
 
     GuiHandlerState {
         m,
-        map_width,
-        map_height,
         tiles_width,
         tiles_height,
         last_update: Instant::now(),

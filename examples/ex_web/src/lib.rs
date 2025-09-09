@@ -2,6 +2,7 @@ use asn_logger::log::info;
 mod gui;
 mod gui_handler;
 mod log_utils;
+mod map;
 
 pub const LOG_MODULE_NAME: &str = "ex_web";
 
