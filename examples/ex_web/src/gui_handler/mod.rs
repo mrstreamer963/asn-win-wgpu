@@ -4,7 +4,7 @@ pub const LOG_MODULE_NAME: &str = "DummyGuiHandler";
 mod gui_handler_state;
 mod time;
 use asn_gui_core::{TAsnGuiElement, TAsnGuiHandler};
-use asn_wgpu::{WgpuGuiHandler, render_manager};
+use asn_wgpu::{WgpuFrameContext, WgpuGraphContext, WgpuGuiHandler};
 use gui_handler_state::GuiHandlerState;
 use gui_handler_state::new_handler_state;
 
@@ -14,8 +14,8 @@ enum WebGuiHandler {
 }
 
 impl TAsnGuiHandler for WebGuiHandler {
-    type GraphContext = render_manager::WgpuGraphContext;
-    type FrameContext = render_manager::WgpuFrameContext;
+    type GraphContext = WgpuGraphContext;
+    type FrameContext = WgpuFrameContext;
 
     fn init(&mut self, gcx: &Self::GraphContext) {
         m_info!("init");
