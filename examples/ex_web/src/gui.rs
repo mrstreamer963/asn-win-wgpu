@@ -7,6 +7,9 @@ pub fn run_gui() {
     let map_height = 32;
     let map = get_map(map_width, map_height);
 
+    // прокидывать map --> GuiMap через очередь (?)
+    // инициализировать GuiMap по дефолту пикселем 1x1 (?)
+
     let h = gui_handler::get_handler();
 
     run_with_handler(h);

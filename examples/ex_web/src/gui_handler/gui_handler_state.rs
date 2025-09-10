@@ -8,8 +8,6 @@ pub const LOOP_MILLIS: u128 = 5;
 
 pub struct GuiHandlerState {
     pub m: WgpuMap,
-    pub tiles_width: u32,
-    pub tiles_height: u32,
     pub last_update: Instant,
 }
 
@@ -30,20 +28,24 @@ impl GuiHandlerState {
     }
 }
 
-pub fn new_handler_state(gcx: &WgpuGraphContext, map_params: &MapParams) -> GuiHandlerState {
+pub fn new_handler_state(
+    gcx: &WgpuGraphContext,
+    map_params: &MapParams,
+    tiles_params: &MapTilesParams,
+) -> GuiHandlerState {
     // let map_tiles_bytes = include_bytes!("../../../tiles_64_95.png");
     // let tiles_width = 64;
     // let tiles_height = 95;
 
-    let map_tiles_bytes = include_bytes!("../../../tiles_16_12.png");
-    let tiles_width = 16;
-    let tiles_height = 12;
+    // let map_tiles_bytes = include_bytes!("../../../tiles_16_12.png");
+    // let tiles_width = 16;
+    // let tiles_height = 12;
 
-    let tiles_params = MapTilesParams {
-        map_tiles_bytes,
-        tiles_width,
-        tiles_height,
-    };
+    // let tiles_params = MapTilesParams {
+    //     map_tiles_bytes,
+    //     tiles_width,
+    //     tiles_height,
+    // };
 
     // let map_width = 32;
     // let map_height = 32;
@@ -81,8 +83,6 @@ pub fn new_handler_state(gcx: &WgpuGraphContext, map_params: &MapParams) -> GuiH
 
     GuiHandlerState {
         m,
-        tiles_width,
-        tiles_height,
         last_update: Instant::now(),
     }
 }
