@@ -12,22 +12,12 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🚀 Building ASN Web Example with Trunk...${NC}"
+echo -e "${BLUE}🚀 Building ASN Web Example...${NC}"
 
 # Check if we're in the right directory
 if [ ! -f "Cargo.toml" ]; then
     echo -e "${RED}❌ Error: Cargo.toml not found. Please run this script from the ex_web directory.${NC}"
     exit 1
-fi
-
-# Check if trunk is installed
-if ! command -v trunk &> /dev/null; then
-    echo -e "${YELLOW}⚠️  trunk is not installed. Installing...${NC}"
-    cargo install trunk
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}❌ Failed to install trunk${NC}"
-        exit 1
-    fi
 fi
 
 # Check if wasm32 target is installed
@@ -45,10 +35,6 @@ if [ "$1" = "--clean" ]; then
     rm -rf pkg
     rm -rf dist
 fi
-
-# Build with trunk
-echo -e "${BLUE}🔨 Building with Trunk...${NC}"
-echo -e "${YELLOW}   This may take a few minutes on first build...${NC}"
 
 # Build with progress
 if trunk build; then
