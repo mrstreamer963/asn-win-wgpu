@@ -4,7 +4,7 @@ use asn_core::transform_set::TransformSet;
 use asn_wgpu::WgpuGraphContext;
 use wgpu_map::{MapParams, MapTilesParams, WgpuMap};
 
-pub const LOOP_MILLIS: u128 = 16;
+pub const LOOP_MILLIS: u128 = 5;
 
 pub struct GuiHandlerState {
     pub m: WgpuMap,

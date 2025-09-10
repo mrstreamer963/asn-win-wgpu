@@ -13,19 +13,26 @@ enum WebGuiHandler {
     Loaded(GuiHandlerState),
 }
 
+impl WebGuiHandler {
+    fn update(&mut self) {
+        if let Self::Loaded(h) = self {
+            h.update();
+        }
+    }
+}
+
 impl TAsnGuiHandler for WebGuiHandler {
     type GraphContext = WgpuGraphContext;
     type FrameContext = WgpuFrameContext;
 
     fn init(&mut self, gcx: &Self::GraphContext) {
         m_info!("init");
-        let h = new_handler_state(gcx);
-        *self = WebGuiHandler::Loaded(h);
+        // let h = new_handler_state(gcx);
+        // *self = WebGuiHandler::Loaded(h);
     }
 
     fn update(&mut self, gcx: &Self::GraphContext) {
         if let Self::Loaded(h) = self {
-            h.update();
             h.m.update(gcx);
         }
     }
