@@ -11,11 +11,16 @@
 ./build-web.sh
 ```
 
+Или используйте Makefile:
+```bash
+make web
+```
+
 Этот скрипт:
 - Проверяет наличие `wasm-pack`
-- Очищает предыдущие сборки
-- Собирает проект для WASM
-- Создает файлы в директории `web/pkg/`
+- Очищает предыдущие сборки (при использовании флага --clean)
+- Собирает проект для WASM с помощью wasm-pack
+- Создает файлы в директории `pkg/`
 
 ### 2. Запуск
 
@@ -29,6 +34,11 @@ python3 -m http.server 8080
 npx serve .
 ```
 
+Или используйте Makefile:
+```bash
+make run-web
+```
+
 ### 3. Открытие в браузере
 
 Откройте http://localhost:8080 в современном браузере.
@@ -39,8 +49,8 @@ npx serve .
 web/
 ├── index.html          # Основная HTML страница
 ├── pkg/                # Собранные WASM файлы
-│   ├── asn_win_wgpu.js
-│   ├── asn_win_wgpu_bg.wasm
+│   ├── ex_web.js
+│   ├── ex_web_bg.wasm
 │   └── package.json
 └── README.md           # Документация web версии
 ```
@@ -81,7 +91,7 @@ web/
 cargo install wasm-pack
 
 # Сборка
-wasm-pack build --target web --out-dir web/pkg
+wasm-pack build --target web --out-dir pkg --release
 
 # Запуск сервера
 cd web && python3 -m http.server 8080

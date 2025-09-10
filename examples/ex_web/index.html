@@ -121,7 +121,7 @@
         }
 
         .button-group h3 {
-            margin: 0 0 15px 0;
+            margin: 0 15px 0;
             color: #495057;
             font-size: 16px;
         }
@@ -173,10 +173,9 @@
         </div>
     </div>
 
-    <!-- trunk-ignore-start -->
     <script type="module">
-        // trunk будет автоматически вставлять сюда скрипт WASM-модуля
-        // Ниже код будет работать после инициализации WASM через trunk
+        // Импортируем WASM-модуль, сгенерированный wasm-pack
+        import init, * as wasmModule from './ex_web.js';
 
         // Глобальные переменные состояния
         let wasmInitialized = false;
@@ -213,32 +212,41 @@
             }
         }
 
-        // Функция инициализации WASM-модуля, будет вызвана после загрузки скрипта trunk'ом
-        function initWasmModule(bindings) {
-            // Проверяем, что все необходимые функции доступны
-            if (typeof bindings.init_web_app === 'undefined' ||
-                typeof bindings.greet === 'undefined' ||
-                typeof bindings.get_version === 'undefined' ||
-                typeof bindings.get_system_info === 'undefined' ||
-                typeof bindings.calculate_fibonacci === 'undefined' ||
-                typeof bindings.get_memory_usage === 'undefined' ||
-                typeof bindings.test_async_operation === 'undefined') {
-                logMessage('❌ Не все функции WASM-модуля доступны', 'error');
+        // Инициализация WASM-модуля
+        async function initWasmModule() {
+            try {
+                logMessage('🔄 Загрузка WASM-модуля...', 'info');
+                updateStatus('loading', 'Загрузка WASM...');
+
+                // Инициализируем WASM-модуль
+                await init();
+
+                // Проверяем, что все необходимые функции доступны
+                if (typeof wasmModule.init_web_app === 'undefined' ||
+                    typeof wasmModule.greet === 'undefined' ||
+                    typeof wasmModule.get_version === 'undefined' ||
+                    typeof wasmModule.get_system_info === 'undefined' ||
+                    typeof wasmModule.calculate_fibonacci === 'undefined' ||
+                    typeof wasmModule.get_memory_usage === 'undefined' ||
+                    typeof wasmModule.test_async_operation === 'undefined') {
+                    logMessage('❌ Не все функции WASM-модуля доступны', 'error');
+                    updateStatus('error', 'Ошибка загрузки');
+                    return;
+                }
+
+                wasmInitialized = true;
+                updateStatus('ready', 'Готов к работе');
+                logMessage('✅ WASM модуль загружен успешно!', 'success');
+
+                // Включаем кнопки после успешной загрузки
+                setButtonState('initApp', true);
+                setButtonState('getVersion', true);
+                setButtonState('greetUser', true);
+            } catch (error) {
+                logMessage(`❌ Ошибка загрузки WASM-модуля: ${error.message}`, 'error');
                 updateStatus('error', 'Ошибка загрузки');
-                return;
+                console.error('WASM initialization error:', error);
             }
-
-            // Сохраняем ссылку на bindings в глобальной переменной
-            window.wasmBindings = bindings;
-
-            wasmInitialized = true;
-            updateStatus('ready', 'Готов к работе');
-            logMessage('✅ WASM модуль загружен успешно!', 'success');
-
-            // Включаем кнопки после успешной загрузки
-            setButtonState('initApp', true);
-            setButtonState('getVersion', true);
-            setButtonState('greetUser', true);
         }
 
         // Глобальные функции для кнопок
@@ -253,7 +261,7 @@
                 logMessage('🔄 Инициализация приложения...', 'info');
                 updateStatus('loading', 'Инициализация...');
 
-                await wasmBindings.init_web_app();
+                await wasmModule.init_web_app();
                 appInitialized = true;
                 updateStatus('ready', 'Приложение готово');
                 logMessage('✅ Приложение инициализировано успешно!', 'success');
@@ -282,7 +290,7 @@
             }
 
             try {
-                const version = wasmBindings.get_version();
+                const version = wasmModule.get_version();
                 logMessage(`📦 Версия приложения: ${version}`, 'info');
             } catch (error) {
                 logMessage(`❌ Ошибка получения версии: ${error.message}`, 'error');
@@ -297,7 +305,7 @@
             }
 
             try {
-                const greeting = wasmBindings.greet('Пользователь');
+                const greeting = wasmModule.greet('Пользователь');
                 logMessage(`👋 ${greeting}`, 'success');
             } catch (error) {
                 logMessage(`❌ Ошибка приветствия: ${error.message}`, 'error');
@@ -313,7 +321,7 @@
             }
 
             try {
-                const info = wasmBindings.get_system_info();
+                const info = wasmModule.get_system_info();
                 logMessage(`💻 ${info}`, 'info');
             } catch (error) {
                 logMessage(`❌ Ошибка получения информации о системе: ${error.message}`, 'error');
@@ -329,7 +337,7 @@
 
             try {
                 const startTime = performance.now();
-                const result = wasmBindings.calculate_fibonacci(40);
+                const result = wasmModule.calculate_fibonacci(40);
                 const endTime = performance.now();
                 const duration = (endTime - startTime).toFixed(2);
 
@@ -347,7 +355,7 @@
             }
 
             try {
-                const usage = wasmBindings.get_memory_usage();
+                const usage = wasmModule.get_memory_usage();
                 logMessage(`💾 ${usage}`, 'info');
             } catch (error) {
                 logMessage(`❌ Ошибка получения информации о памяти: ${error.message}`, 'error');
@@ -363,7 +371,7 @@
 
             try {
                 logMessage('⏳ Запуск асинхронной операции...', 'info');
-                await wasmBindings.test_async_operation();
+                await wasmModule.test_async_operation();
                 logMessage('✅ Асинхронная операция завершена успешно!', 'success');
             } catch (error) {
                 logMessage(`❌ Ошибка асинхронной операции: ${error.message}`, 'error');
@@ -382,18 +390,13 @@
             console.error('Unhandled promise rejection:', event.reason);
         });
 
-        // Обработчик события, которое отправляется после загрузки WASM-модуля trunk'ом
-        window.addEventListener('TrunkApplicationStarted', function (event) {
-            console.log('Trunk application started, initializing WASM module...');
-            initWasmModule(event.detail.wasm);
+        // Инициализируем WASM-модуль при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function () {
+            initWasmModule();
         });
 
         console.log('ASN Web Example загружен успешно!');
     </script>
-    <!-- trunk-ignore-end -->
-
-    <!-- trunk будет вставлять сюда тег <script> для загрузки WASM-модуля -->
-    <!-- <script type="module" src="./ex_web.js"></script> - Этот тег будет автоматически вставлен trunk'ом -->
 </body>
 
 </html>
