@@ -30,6 +30,8 @@ asn-win-wgpu/
 ├── Cargo.lock              # Dependency lock file
 ├── Cargo.toml              # Project manifest
 ├── README.md               # This file
+├── build-web.sh            # Web build script
+├── run-web.sh              # Web run script
 ├── examples/               # Usage examples
 │   ├── ex_bus.rs          # Event bus example
 │   ├── ex_gui.rs          # GUI example

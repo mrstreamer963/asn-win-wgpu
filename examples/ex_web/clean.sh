@@ -29,7 +29,7 @@ else
     echo -e "${YELLOW}ℹ️  Target directory not found${NC}"
 fi
 
-# Clean pkg directory (WASM build output from wasm-pack)
+# Clean pkg directory (WASM build output from wasm-bindgen)
 if [ -d "pkg" ]; then
     echo -e "${YELLOW}🗑️  Removing pkg directory...${NC}"
     rm -rf pkg
@@ -38,7 +38,7 @@ else
     echo -e "${YELLOW}ℹ️  Pkg directory not found${NC}"
 fi
 
-# Clean dist directory (Web build output from trunk)
+# Clean dist directory (Web build output)
 if [ -d "dist" ]; then
     echo -e "${YELLOW}🗑️  Removing dist directory...${NC}"
     rm -rf dist
