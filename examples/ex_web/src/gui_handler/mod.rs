@@ -26,6 +26,7 @@ impl TAsnGuiHandler for WebGuiHandler {
     type FrameContext = WgpuFrameContext;
 
     fn init(&mut self, gcx: &Self::GraphContext) {
+        let _ = gcx;
         m_info!("init");
         // let h = new_handler_state(gcx);
         // *self = WebGuiHandler::Loaded(h);
