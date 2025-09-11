@@ -14,8 +14,9 @@ asn-core = { path = "../../modules/asn-core" }
 asn-core-bus = { path = "../../modules/asn-core-bus" }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tokio.workspace = true
+tokio = { version = "1.47", features = ["full"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
+tokio = { version = "1.47", default-features = false, features = ["sync", "macros"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASN Web Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .loading {
+            display: none;
+            color: #007bff;
+            font-style: italic;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+
+        .info {
+            color: #0c5460;
+            background: #d1ecf1;
+            padding: 8px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+
+        .timestamp {
+            color: #6c757d;
+            font-size: 12px;
+        }
+
+        .status-bar {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-ready {
+            background: #28a745;
+        }
+
+        .status-loading {
+            background: #ffc107;
+        }
+
+        .status-error {
+            background: #dc3545;
+        }
+
+        .button-group {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #007bff;
+        }
+
+        .button-group h3 {
+            margin: 0 15px 0;
+            color: #495057;
+            font-size: 16px;
+        }
+
+        .button-group button {
+            margin: 5px;
+        }
+
+        .webgpu-canvas {
+            width: 100%;
+            height: 400px;
+            border: 1px solid red;
+            border-radius: 4px;
+            margin: 20px 0;
+            background-color: cyan;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>ASN Web Example</h1>
+        <p>Этот пример демонстрирует использование ASN WGPU в веб-среде.</p>
+
+        <canvas id="asn-canvas" width="800" height="600" class="webgpu-canvas"></canvas>
+
+        <div class="button-group">
+            <h3>Основные функции</h3>
+            <button onclick="initApp()">Инициализировать приложение</button>
+            <button onclick="getVersion()">Получить версию</button>
+            <button onclick="greetUser()">Приветствие</button>
+        </div>
+
+        <div class="button-group">
+            <h3>Демонстрация возможностей</h3>
+            <button onclick="getSystemInfo()">Информация о системе</button>
+            <button onclick="testFibonacci()">Тест производительности</button>
+            <button onclick="getMemoryUsage()">Использование памяти</button>
+            <button onclick="testAsyncOperation()">Асинхронная операция</button>
+        </div>
+
+        <div id="output">
+            <p class="info">🚀 ASN Web Example готов к работе. Нажмите кнопки выше для тестирования функций...</p>
+        </div>
+
+        <div class="status-bar">
+            <span class="status-indicator status-loading" id="statusIndicator"></span>
+            <span id="statusText">Инициализация...</span>
+        </div>
+    </div>
+
+    <script type="module">
+        // Импортируем WASM-модуль, сгенерированный wasm-pack
+        import init, * as wasmModule from './ex_web.js';
+
+        // Глобальные переменные состояния
+        let wasmInitialized = false;
+        let appInitialized = false;
+
+        // Утилиты для логирования
+        function logMessage(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+
+            const logEntry = document.createElement('div');
+            logEntry.className = className;
+            logEntry.innerHTML = `
+                <span class="timestamp">[${timestamp}]</span> ${message}
+            `;
+            output.appendChild(logEntry);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function updateStatus(status, text) {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+
+            indicator.className = `status-indicator status-${status}`;
+            statusText.textContent = text;
+        }
+
+        function setButtonState(buttonId, enabled) {
+            const button = document.querySelector(`button[onclick="${buttonId}()"]`);
+            if (button) {
+                button.disabled = !enabled;
+                button.style.opacity = enabled ? '1' : '0.6';
+            }
+        }
+
+        // Инициализация WASM-модуля
+        async function initWasmModule() {
+            try {
+                logMessage('🔄 Загрузка WASM-модуля...', 'info');
+                updateStatus('loading', 'Загрузка WASM...');
+
+                // Инициализируем WASM-модуль
+                await init();
+
+                // Проверяем, что все необходимые функции доступны
+                if (typeof wasmModule.init_web_app === 'undefined' ||
+                    typeof wasmModule.greet === 'undefined' ||
+                    typeof wasmModule.get_version === 'undefined' ||
+                    typeof wasmModule.get_system_info === 'undefined' ||
+                    typeof wasmModule.calculate_fibonacci === 'undefined' ||
+                    typeof wasmModule.get_memory_usage === 'undefined' ||
+                    typeof wasmModule.test_async_operation === 'undefined') {
+                    logMessage('❌ Не все функции WASM-модуля доступны', 'error');
+                    updateStatus('error', 'Ошибка загрузки');
+                    return;
+                }
+
+                wasmInitialized = true;
+                updateStatus('ready', 'Готов к работе');
+                logMessage('✅ WASM модуль загружен успешно!', 'success');
+
+                // Включаем кнопки после успешной загрузки
+                setButtonState('initApp', true);
+                setButtonState('getVersion', true);
+                setButtonState('greetUser', true);
+            } catch (error) {
+                logMessage(`❌ Ошибка загрузки WASM-модуля: ${error.message}`, 'error');
+                updateStatus('error', 'Ошибка загрузки');
+                console.error('WASM initialization error:', error);
+            }
+        }
+
+        // Глобальные функции для кнопок
+        window.initApp = async function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                setButtonState('initApp', false);
+                logMessage('🔄 Инициализация приложения...', 'info');
+                updateStatus('loading', 'Инициализация...');
+
+                await wasmModule.init_web_app();
+                appInitialized = true;
+                updateStatus('ready', 'Приложение готово');
+                logMessage('✅ Приложение инициализировано успешно!', 'success');
+
+            } catch (error) {
+                updateStatus('error', 'Ошибка инициализации');
+
+                if (error.message && error.message.startsWith("Using exceptions for control flow,")) {
+                    // Это нормальное поведение для некоторых WASM функций
+                    logMessage('ℹ️ Инициализация завершена (исключение для управления потоком)', 'info');
+                    appInitialized = true;
+                    updateStatus('ready', 'Приложение готово');
+                } else {
+                    logMessage(`❌ Ошибка инициализации: ${error}`, 'error');
+                    console.error('App initialization error:', error);
+                }
+            } finally {
+                setButtonState('initApp', true);
+            }
+        };
+
+        window.getVersion = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const version = wasmModule.get_version();
+                logMessage(`📦 Версия приложения: ${version}`, 'info');
+            } catch (error) {
+                logMessage(`❌ Ошибка получения версии: ${error.message}`, 'error');
+                console.error('Version error:', error);
+            }
+        };
+
+        window.greetUser = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const greeting = wasmModule.greet('Пользователь');
+                logMessage(`👋 ${greeting}`, 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка приветствия: ${error.message}`, 'error');
+                console.error('Greet error:', error);
+            }
+        };
+
+        // Новые функции для демонстрации возможностей
+        window.getSystemInfo = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const info = wasmModule.get_system_info();
+                logMessage(`💻 ${info}`, 'info');
+            } catch (error) {
+                logMessage(`❌ Ошибка получения информации о системе: ${error.message}`, 'error');
+                console.error('System info error:', error);
+            }
+        };
+
+        window.testFibonacci = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const startTime = performance.now();
+                const result = wasmModule.calculate_fibonacci(40);
+                const endTime = performance.now();
+                const duration = (endTime - startTime).toFixed(2);
+
+                logMessage(`🧮 Число Фибоначчи(40) = ${result} (вычислено за ${duration}мс)`, 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка вычисления Фибоначчи: ${error.message}`, 'error');
+                console.error('Fibonacci error:', error);
+            }
+        };
+
+        window.getMemoryUsage = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const usage = wasmModule.get_memory_usage();
+                logMessage(`💾 ${usage}`, 'info');
+            } catch (error) {
+                logMessage(`❌ Ошибка получения информации о памяти: ${error.message}`, 'error');
+                console.error('Memory usage error:', error);
+            }
+        };
+
+        window.testAsyncOperation = async function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                logMessage('⏳ Запуск асинхронной операции...', 'info');
+                await wasmModule.test_async_operation();
+                logMessage('✅ Асинхронная операция завершена успешно!', 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка асинхронной операции: ${error.message}`, 'error');
+                console.error('Async operation error:', error);
+            }
+        };
+
+        // Обработка ошибок на уровне страницы
+        window.addEventListener('error', function (event) {
+            logMessage(`❌ Глобальная ошибка: ${event.error?.message || event.message}`, 'error');
+            console.error('Global error:', event.error);
+        });
+
+        window.addEventListener('unhandledrejection', function (event) {
+            logMessage(`❌ Необработанное отклонение Promise: ${event.reason}`, 'error');
+            console.error('Unhandled promise rejection:', event.reason);
+        });
+
+        // Инициализируем WASM-модуль при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function () {
+            initWasmModule();
+        });
+
+        console.log('ASN Web Example загружен успешно!');
+    </script>
+</body>
+
+</html>
