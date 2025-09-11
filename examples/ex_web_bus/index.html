@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASN Web Example</title>
+    <title>ASN Web Bus Example</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -143,8 +143,8 @@
 
 <body>
     <div class="container">
-        <h1>ASN Web Example</h1>
-        <p>Этот пример демонстрирует использование ASN WGPU в веб-среде.</p>
+        <h1>ASN Web Bus Example</h1>
+        <p>Этот пример демонстрирует использование ASN Bus в веб-среде.</p>
 
         <canvas id="asn-canvas" width="800" height="600" class="webgpu-canvas"></canvas>
 
@@ -152,19 +152,17 @@
             <h3>Основные функции</h3>
             <button onclick="initApp()">Инициализировать приложение</button>
             <button onclick="getVersion()">Получить версию</button>
-            <button onclick="greetUser()">Приветствие</button>
         </div>
 
         <div class="button-group">
-            <h3>Демонстрация возможностей</h3>
-            <button onclick="getSystemInfo()">Информация о системе</button>
-            <button onclick="testFibonacci()">Тест производительности</button>
-            <button onclick="getMemoryUsage()">Использование памяти</button>
-            <button onclick="testAsyncOperation()">Асинхронная операция</button>
+            <h3>Демонстрация Bus</h3>
+            <button onclick="sendTaskUpdate()">Отправить TaskUpdate</button>
+            <button onclick="sendTaskNone()">Отправить TaskNone</button>
+            <button onclick="receiveMessage()">Получить сообщение</button>
         </div>
 
         <div id="output">
-            <p class="info">🚀 ASN Web Example готов к работе. Нажмите кнопки выше для тестирования функций...</p>
+            <p class="info">🚀 ASN Web Bus Example готов к работе. Нажмите кнопки выше для тестирования функций...</p>
         </div>
 
         <div class="status-bar">
@@ -175,7 +173,7 @@
 
     <script type="module">
         // Импортируем WASM-модуль, сгенерированный wasm-pack
-        import init, * as wasmModule from './ex_web.js';
+        import init, * as wasmModule from './ex_web_bus.js';
 
         // Глобальные переменные состояния
         let wasmInitialized = false;
@@ -223,12 +221,10 @@
 
                 // Проверяем, что все необходимые функции доступны
                 if (typeof wasmModule.init_web_app === 'undefined' ||
-                    typeof wasmModule.greet === 'undefined' ||
                     typeof wasmModule.get_version === 'undefined' ||
-                    typeof wasmModule.get_system_info === 'undefined' ||
-                    typeof wasmModule.calculate_fibonacci === 'undefined' ||
-                    typeof wasmModule.get_memory_usage === 'undefined' ||
-                    typeof wasmModule.test_async_operation === 'undefined') {
+                    typeof wasmModule.send_task_update === 'undefined' ||
+                    typeof wasmModule.send_task_none === 'undefined' ||
+                    typeof wasmModule.receive_message === 'undefined') {
                     logMessage('❌ Не все функции WASM-модуля доступны', 'error');
                     updateStatus('error', 'Ошибка загрузки');
                     return;
@@ -241,7 +237,9 @@
                 // Включаем кнопки после успешной загрузки
                 setButtonState('initApp', true);
                 setButtonState('getVersion', true);
-                setButtonState('greetUser', true);
+                setButtonState('sendTaskUpdate', true);
+                setButtonState('sendTaskNone', true);
+                setButtonState('receiveMessage', true);
             } catch (error) {
                 logMessage(`❌ Ошибка загрузки WASM-модуля: ${error.message}`, 'error');
                 updateStatus('error', 'Ошибка загрузки');
@@ -261,7 +259,7 @@
                 logMessage('🔄 Инициализация приложения...', 'info');
                 updateStatus('loading', 'Инициализация...');
 
-                await wasmModule.init_web_app();
+                const result = wasmModule.init_web_app();
                 appInitialized = true;
                 updateStatus('ready', 'Приложение готово');
                 logMessage('✅ Приложение инициализировано успешно!', 'success');
@@ -298,84 +296,49 @@
             }
         };
 
-        window.greetUser = function () {
+        // Функции для демонстрации Bus
+        window.sendTaskUpdate = function () {
             if (!wasmInitialized) {
                 logMessage('❌ WASM модуль не инициализирован', 'error');
                 return;
             }
 
             try {
-                const greeting = wasmModule.greet('Пользователь');
-                logMessage(`👋 ${greeting}`, 'success');
+                const result = wasmModule.send_task_update();
+                logMessage(`📤 ${result}`, 'info');
             } catch (error) {
-                logMessage(`❌ Ошибка приветствия: ${error.message}`, 'error');
-                console.error('Greet error:', error);
+                logMessage(`❌ Ошибка отправки TaskUpdate: ${error.message}`, 'error');
+                console.error('Send TaskUpdate error:', error);
             }
         };
 
-        // Новые функции для демонстрации возможностей
-        window.getSystemInfo = function () {
+        window.sendTaskNone = function () {
             if (!wasmInitialized) {
                 logMessage('❌ WASM модуль не инициализирован', 'error');
                 return;
             }
 
             try {
-                const info = wasmModule.get_system_info();
-                logMessage(`💻 ${info}`, 'info');
+                const result = wasmModule.send_task_none();
+                logMessage(`📤 ${result}`, 'info');
             } catch (error) {
-                logMessage(`❌ Ошибка получения информации о системе: ${error.message}`, 'error');
-                console.error('System info error:', error);
+                logMessage(`❌ Ошибка отправки TaskNone: ${error.message}`, 'error');
+                console.error('Send TaskNone error:', error);
             }
         };
 
-        window.testFibonacci = function () {
+        window.receiveMessage = function () {
             if (!wasmInitialized) {
                 logMessage('❌ WASM модуль не инициализирован', 'error');
                 return;
             }
 
             try {
-                const startTime = performance.now();
-                const result = wasmModule.calculate_fibonacci(40);
-                const endTime = performance.now();
-                const duration = (endTime - startTime).toFixed(2);
-
-                logMessage(`🧮 Число Фибоначчи(40) = ${result} (вычислено за ${duration}мс)`, 'success');
+                const result = wasmModule.receive_message();
+                logMessage(`📥 ${result}`, 'info');
             } catch (error) {
-                logMessage(`❌ Ошибка вычисления Фибоначчи: ${error.message}`, 'error');
-                console.error('Fibonacci error:', error);
-            }
-        };
-
-        window.getMemoryUsage = function () {
-            if (!wasmInitialized) {
-                logMessage('❌ WASM модуль не инициализирован', 'error');
-                return;
-            }
-
-            try {
-                const usage = wasmModule.get_memory_usage();
-                logMessage(`💾 ${usage}`, 'info');
-            } catch (error) {
-                logMessage(`❌ Ошибка получения информации о памяти: ${error.message}`, 'error');
-                console.error('Memory usage error:', error);
-            }
-        };
-
-        window.testAsyncOperation = async function () {
-            if (!wasmInitialized) {
-                logMessage('❌ WASM модуль не инициализирован', 'error');
-                return;
-            }
-
-            try {
-                logMessage('⏳ Запуск асинхронной операции...', 'info');
-                await wasmModule.test_async_operation();
-                logMessage('✅ Асинхронная операция завершена успешно!', 'success');
-            } catch (error) {
-                logMessage(`❌ Ошибка асинхронной операции: ${error.message}`, 'error');
-                console.error('Async operation error:', error);
+                logMessage(`❌ Ошибка получения сообщения: ${error.message}`, 'error');
+                console.error('Receive message error:', error);
             }
         };
 
@@ -395,7 +358,7 @@
             initWasmModule();
         });
 
-        console.log('ASN Web Example загружен успешно!');
+        console.log('ASN Web Bus Example загружен успешно!');
     </script>
 </body>
 

@@ -604,7 +604,10 @@ version = "0.1.0"
 dependencies = [
  "asn-core",
  "asn-core-bus",
+ "js-sys",
  "tokio-bus",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
