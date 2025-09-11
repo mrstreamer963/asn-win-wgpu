@@ -599,6 +599,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ex_web_bus"
+version = "0.1.0"
+dependencies = [
+ "asn-core",
+ "asn-core-bus",
+]
+
+[[package]]
 name = "fdeflate"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"

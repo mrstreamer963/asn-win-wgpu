@@ -1,0 +1,15 @@
+[package]
+name = "ex_web_bus"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "ex_web_bus"
+path = "src/main.rs"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+asn-core = { path = "../../modules/asn-core" }
+asn-core-bus = { path = "../../modules/asn-core-bus" }

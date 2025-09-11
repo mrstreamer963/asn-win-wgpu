@@ -14,6 +14,7 @@ crate-type = ["cdylib", "rlib"]
 
 [workspace]
 resolver = "2"
+members = ["examples/ex_web_bus"]
 
 [workspace.dependencies]
 tokio = { version = "1.47", features = ["full"] }
@@ -85,5 +86,10 @@ wasm-opt = false
 
 [[example]]
 name = "ex_web"
+path = "examples/ex_web/src/lib.rs"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "ex_web_bus"
 path = "examples/ex_web/src/lib.rs"
 crate-type = ["cdylib"]
