@@ -141,10 +141,10 @@
     <div class="container">
         <h1>ASN Web Bus Example</h1>
         <p>Этот пример демонстрирует использование ASN Bus в веб-среде.</p>
+        <p><strong>Для запуска используйте <code>trunk serve</code> или <code>trunk build</code>.</strong></p>
 
         <div class="button-group">
             <h3>Основные функции</h3>
-            <button onclick="initApp()">Инициализировать приложение</button>
             <button onclick="getVersion()">Получить версию</button>
         </div>
 
@@ -166,8 +166,8 @@
     </div>
 
     <script type="module">
-        // Импортируем WASM-модуль, сгенерированный wasm-pack
-        import init, * as wasmModule from './ex_web_bus.js';
+        // Импортируем WASM-модуль, сгенерированный trunk
+        // import init from './ex_web_bus.js';
 
         // Глобальные переменные состояния
         let wasmInitialized = false;
@@ -202,63 +202,32 @@
             });
         }
 
-        // Инициализация WASM-модуля
-        async function initWasmModule() {
-            try {
-                logMessage('🔄 Загрузка WASM-модуля...', 'info');
-                updateStatus('loading', 'Загрузка WASM...');
+        logMessage('🔄 Загрузка WASM-модуля...', 'info');
+        updateStatus('loading', 'Загрузка WASM...');
 
-                // Инициализируем WASM-модуль
-                await init();
+        addEventListener("TrunkApplicationStarted", (event) => {
+            console.log("application started - bindings:", window.wasmBindings)
+            console.log("WASM:", event.detail.wasm);
 
-                // Проверяем, что все необходимые функции доступны
-                if (typeof wasmModule.init_web_app === 'undefined' ||
-                    typeof wasmModule.get_version === 'undefined' ||
-                    typeof wasmModule.send_task_update === 'undefined' ||
-                    typeof wasmModule.send_task_none === 'undefined' ||
-                    typeof wasmModule.receive_message === 'undefined') {
-                    logMessage('❌ Не все функции WASM-модуля доступны', 'error');
-                    updateStatus('error', 'Ошибка загрузки');
-                    return;
-                }
-
-                wasmInitialized = true;
-                updateStatus('ready', 'Готов к работе');
-                logMessage('✅ WASM модуль загружен успешно!', 'success');
-                setButtonState(true);
-
-            } catch (error) {
-                logMessage(`❌ Ошибка загрузки WASM-модуля: ${error.message}`, 'error');
+            // Проверяем, что все необходимые функции доступны
+            if (typeof window.wasmBindings.init_web_app === 'undefined' ||
+                typeof window.wasmBindings.get_version === 'undefined' ||
+                typeof window.wasmBindings.send_task_update === 'undefined' ||
+                typeof window.wasmBindings.send_task_none === 'undefined' ||
+                typeof window.wasmBindings.receive_message === 'undefined') {
+                logMessage('❌ Не все функции WASM-модуля доступны', 'error');
                 updateStatus('error', 'Ошибка загрузки');
-                console.error('WASM initialization error:', error);
-            }
-        }
-
-        // Глобальные функции для кнопок
-        window.initApp = async function () {
-            if (!wasmInitialized) {
-                logMessage('❌ WASM модуль не инициализирован', 'error');
                 return;
             }
 
-            try {
-                setButtonState(false);
-                logMessage('🔄 Инициализация приложения...', 'info');
-                updateStatus('loading', 'Инициализация...');
 
-                await wasmModule.init_web_app();
-                updateStatus('ready', 'Приложение готово');
-                logMessage('✅ Приложение инициализировано успешно!', 'success');
+            wasmInitialized = true;
+            updateStatus('ready', 'Готов к работе');
+            logMessage('✅ WASM модуль загружен успешно!', 'success');
+            setButtonState(true);
+        });
 
-            } catch (error) {
-                updateStatus('error', 'Ошибка инициализации');
-                logMessage(`❌ Ошибка инициализации: ${error}`, 'error');
-                console.error('App initialization error:', error);
-            } finally {
-                setButtonState(true);
-            }
-        };
-
+        // Глобальные функции для кнопок
         window.getVersion = function () {
             if (!wasmInitialized) {
                 logMessage('❌ WASM модуль не инициализирован', 'error');
@@ -266,7 +235,7 @@
             }
 
             try {
-                const version = wasmModule.get_version();
+                const version = window.wasmBindings.get_version();
                 logMessage(`📦 Версия приложения: ${version}`, 'info');
             } catch (error) {
                 logMessage(`❌ Ошибка получения версии: ${error.message}`, 'error');
@@ -281,7 +250,7 @@
             }
 
             try {
-                const result = wasmModule.send_task_update();
+                const result = window.wasmBindings.send_task_update();
                 logMessage(`📤 ${result}`, 'info');
             } catch (error) {
                 logMessage(`❌ Ошибка отправки TaskUpdate: ${error.message}`, 'error');
@@ -296,7 +265,7 @@
             }
 
             try {
-                const result = wasmModule.send_task_none();
+                const result = window.wasmBindings.send_task_none();
                 logMessage(`📤 ${result}`, 'info');
             } catch (error) {
                 logMessage(`❌ Ошибка отправки TaskNone: ${error.message}`, 'error');
@@ -311,7 +280,7 @@
             }
 
             try {
-                const result = wasmModule.receive_message();
+                const result = window.wasmBindings.receive_message();
                 logMessage(`📥 ${result}`, 'info');
             } catch (error) {
                 logMessage(`❌ Ошибка получения сообщения: ${error.message}`, 'error');
@@ -328,11 +297,6 @@
         window.addEventListener('unhandledrejection', function (event) {
             logMessage(`❌ Необработанное отклонение Promise: ${event.reason}`, 'error');
             console.error('Unhandled promise rejection:', event.reason);
-        });
-
-        // Инициализируем WASM-модуль при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function () {
-            initWasmModule();
         });
 
         console.log('ASN Web Bus Example загружен успешно!');
