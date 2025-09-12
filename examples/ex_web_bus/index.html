@@ -25,7 +25,7 @@
             background: #007bff;
             color: white;
             border: none;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
             margin: 5px;
@@ -34,6 +34,11 @@
 
         button:hover {
             background: #0056b3;
+        }
+
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
         }
 
         #output {
@@ -121,22 +126,13 @@
         }
 
         .button-group h3 {
-            margin: 0 15px 0;
+            margin: 0 0 10px 0;
             color: #495057;
             font-size: 16px;
         }
 
         .button-group button {
             margin: 5px;
-        }
-
-        .webgpu-canvas {
-            width: 100%;
-            height: 400px;
-            border: 1px solid red;
-            border-radius: 4px;
-            margin: 20px 0;
-            background-color: cyan;
         }
     </style>
 </head>
@@ -146,8 +142,6 @@
         <h1>ASN Web Bus Example</h1>
         <p>Этот пример демонстрирует использование ASN Bus в веб-среде.</p>
 
-        <canvas id="asn-canvas" width="800" height="600" class="webgpu-canvas"></canvas>
-
         <div class="button-group">
             <h3>Основные функции</h3>
             <button onclick="initApp()">Инициализировать приложение</button>
@@ -155,7 +149,7 @@
         </div>
 
         <div class="button-group">
-            <h3>Демонстрация Bus</h3>
+            <h3>Работа с шиной событий</h3>
             <button onclick="sendTaskUpdate()">Отправить TaskUpdate</button>
             <button onclick="sendTaskNone()">Отправить TaskNone</button>
             <button onclick="receiveMessage()">Получить сообщение</button>
@@ -177,7 +171,6 @@
 
         // Глобальные переменные состояния
         let wasmInitialized = false;
-        let appInitialized = false;
 
         // Утилиты для логирования
         function logMessage(message, type = 'info') {
@@ -202,12 +195,11 @@
             statusText.textContent = text;
         }
 
-        function setButtonState(buttonId, enabled) {
-            const button = document.querySelector(`button[onclick="${buttonId}()"]`);
-            if (button) {
+        function setButtonState(enabled) {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
                 button.disabled = !enabled;
-                button.style.opacity = enabled ? '1' : '0.6';
-            }
+            });
         }
 
         // Инициализация WASM-модуля
@@ -233,13 +225,8 @@
                 wasmInitialized = true;
                 updateStatus('ready', 'Готов к работе');
                 logMessage('✅ WASM модуль загружен успешно!', 'success');
+                setButtonState(true);
 
-                // Включаем кнопки после успешной загрузки
-                setButtonState('initApp', true);
-                setButtonState('getVersion', true);
-                setButtonState('sendTaskUpdate', true);
-                setButtonState('sendTaskNone', true);
-                setButtonState('receiveMessage', true);
             } catch (error) {
                 logMessage(`❌ Ошибка загрузки WASM-модуля: ${error.message}`, 'error');
                 updateStatus('error', 'Ошибка загрузки');
@@ -255,29 +242,20 @@
             }
 
             try {
-                setButtonState('initApp', false);
+                setButtonState(false);
                 logMessage('🔄 Инициализация приложения...', 'info');
                 updateStatus('loading', 'Инициализация...');
 
-                const result = wasmModule.init_web_app();
-                appInitialized = true;
+                await wasmModule.init_web_app();
                 updateStatus('ready', 'Приложение готово');
                 logMessage('✅ Приложение инициализировано успешно!', 'success');
 
             } catch (error) {
                 updateStatus('error', 'Ошибка инициализации');
-
-                if (error.message && error.message.startsWith("Using exceptions for control flow,")) {
-                    // Это нормальное поведение для некоторых WASM функций
-                    logMessage('ℹ️ Инициализация завершена (исключение для управления потоком)', 'info');
-                    appInitialized = true;
-                    updateStatus('ready', 'Приложение готово');
-                } else {
-                    logMessage(`❌ Ошибка инициализации: ${error}`, 'error');
-                    console.error('App initialization error:', error);
-                }
+                logMessage(`❌ Ошибка инициализации: ${error}`, 'error');
+                console.error('App initialization error:', error);
             } finally {
-                setButtonState('initApp', true);
+                setButtonState(true);
             }
         };
 
@@ -296,7 +274,6 @@
             }
         };
 
-        // Функции для демонстрации Bus
         window.sendTaskUpdate = function () {
             if (!wasmInitialized) {
                 logMessage('❌ WASM модуль не инициализирован', 'error');
