@@ -5,7 +5,7 @@ use wasm_bindgen::prelude::*;
 mod setup_log;
 mod web_bus;
 use setup_log::setup_log;
-use web_bus::{TaskType, get_bus, send_message_internal};
+use web_bus::{TaskType, get_bus};
 
 const LOG_MODULE_NAME: &str = "ex_web_bus";
 
@@ -35,9 +35,12 @@ pub fn init_web_app() -> Result<(), JsValue> {
 #[wasm_bindgen]
 pub fn send_task_update() -> String {
     m_info!("send_task_update");
-    match send_message_internal(TaskType::TaskUpdate) {
+
+    let s = get_bus().get_sender();
+
+    match s.send_message(TaskType::TaskUpdate) {
         Ok(_) => "Message sent successfully".to_string(),
-        Err(e) => format!("Error sending message: {}", e),
+        Err(e) => format!("Error sending message: {:?}", e),
     }
 }
 
@@ -45,9 +48,11 @@ pub fn send_task_update() -> String {
 pub fn send_task_none() -> String {
     m_info!("send_task_none");
 
-    match send_message_internal(TaskType::TaskNone) {
+    let s = get_bus().get_sender();
+
+    match s.send_message(TaskType::TaskNone) {
         Ok(_) => "Message sent successfully".to_string(),
-        Err(e) => format!("Error sending message: {}", e),
+        Err(e) => format!("Error sending message: {:?}", e),
     }
 }
 
