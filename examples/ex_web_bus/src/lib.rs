@@ -14,17 +14,14 @@ enum TaskType {
     TaskUpdate,
 }
 
-// Глобальная переменная для хранения шины данных
-static BUS: OnceLock<TokioEventBus<TaskType>> = OnceLock::new();
+type WebBus = TokioEventBus<TaskType>;
 
-// Функция для инициализации шины данных
-fn init_bus() {
-    BUS.get_or_init(|| new_tokio_bus::<TaskType>(16));
-}
+// Глобальная переменная для хранения шины данных
+static BUS: OnceLock<WebBus> = OnceLock::new();
 
 // Функция для получения ссылки на шину данных
-fn get_bus() -> &'static TokioEventBus<TaskType> {
-    BUS.get().expect("Bus should be initialized")
+fn get_bus() -> &'static WebBus {
+    BUS.get_or_init(|| new_tokio_bus::<TaskType>(16))
 }
 
 #[wasm_bindgen]
@@ -34,20 +31,20 @@ pub fn init_web_app() -> Result<(), JsValue> {
     m_info!("Hello from init_web_app");
 
     // Инициализируем шину данных
-    init_bus();
+    get_bus();
 
-    let bus = get_bus();
-    let sender = bus.get_sender();
-    let mut receiver = bus.get_receiver();
+    // let bus = get_bus();
+    // let sender = bus.get_sender();
+    // let mut receiver = bus.get_receiver();
 
-    sender.send_message(TaskType::TaskUpdate).unwrap();
-    sender.send_message(TaskType::TaskNone).unwrap();
+    // sender.send_message(TaskType::TaskUpdate).unwrap();
+    // sender.send_message(TaskType::TaskNone).unwrap();
 
-    let mess = receiver.get_message().unwrap();
-    m_info!("Mess: {:?}", mess);
+    // let mess = receiver.get_message().unwrap();
+    // m_info!("Mess: {:?}", mess);
 
-    let mess = receiver.get_message().unwrap();
-    m_info!("Mess: {:?}", mess);
+    // let mess = receiver.get_message().unwrap();
+    // m_info!("Mess: {:?}", mess);
 
     // Простая инициализация для web
     Ok(())
@@ -76,9 +73,6 @@ pub fn send_task_none() -> String {
 pub fn receive_message() -> String {
     m_info!("receive_message");
 
-    // Инициализируем шину данных, если она еще не инициализирована
-    init_bus();
-
     let bus = get_bus();
     let mut receiver = bus.get_receiver();
 
@@ -97,9 +91,6 @@ pub fn get_version() -> String {
 // Вспомогательная функция для отправки сообщений
 fn send_message_internal(message: TaskType) -> Result<(), String> {
     m_info!("send_message_internal");
-
-    // Инициализируем шину данных, если она еще не инициализирована
-    init_bus();
 
     let bus = get_bus();
     let sender = bus.get_sender();
