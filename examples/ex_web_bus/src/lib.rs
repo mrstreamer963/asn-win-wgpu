@@ -20,8 +20,23 @@ enum TaskType {
 pub fn init_web_app() -> Result<(), JsValue> {
     setup_log().unwrap();
 
-    // Простая инициализация для web
     m_info!("Hello from init_web_app");
+
+    let bus = new_tokio_bus::<TaskType>(16);
+
+    let sender = bus.get_sender();
+    let mut receiver = bus.get_receiver();
+
+    sender.send_message(TaskType::TaskUpdate).unwrap();
+    sender.send_message(TaskType::TaskNone).unwrap();
+
+    let mess = receiver.get_message().unwrap();
+    m_info!("Mess: {:?}", mess);
+
+    let mess = receiver.get_message().unwrap();
+    m_info!("Mess: {:?}", mess);
+
+    // Простая инициализация для web
     Ok(())
 }
 
@@ -70,10 +85,20 @@ fn send_message_internal(message: TaskType) -> Result<(), String> {
 
     let bus = new_tokio_bus::<TaskType>(16);
     let sender = bus.get_sender();
+    let mut receiver = bus.get_receiver();
 
-    sender
+    let r = sender
         .send_message(message)
-        .map_err(|e| format!("Failed to send message: {:?}", e))
+        .map_err(|e| format!("Failed to send message: {:?}", e));
+
+    if r.is_err() {
+        return r;
+    }
+
+    let m = receiver.get_message().unwrap();
+    m_info!("{m:?}");
+
+    Ok(())
 }
 
 fn setup_log() -> Result<(), String> {
