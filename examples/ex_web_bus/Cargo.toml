@@ -10,6 +10,8 @@ crate-type = ["cdylib"]
 target = "wasm32-unknown-unknown"
 
 [dependencies]
+asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "3.1.0", features = [
+] }
 asn-core = { path = "../../modules/asn-core" }
 asn-core-bus = { path = "../../modules/asn-core-bus" }
 tokio-bus = { path = "../../modules/tokio-bus" }

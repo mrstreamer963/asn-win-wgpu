@@ -604,6 +604,7 @@ version = "0.1.0"
 dependencies = [
  "asn-core",
  "asn-core-bus",
+ "asn-logger",
  "js-sys",
  "tokio-bus",
  "wasm-bindgen",
