@@ -145,6 +145,7 @@
 
         <div class="button-group">
             <h3>Основные функции</h3>
+            <button onclick="initApp()">Инициализировать приложение</button>
             <button onclick="getVersion()">Получить версию</button>
         </div>
 
@@ -285,6 +286,21 @@
             } catch (error) {
                 logMessage(`❌ Ошибка получения сообщения: ${error.message}`, 'error');
                 console.error('Receive message error:', error);
+            }
+        };
+
+        window.initApp = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                window.wasmBindings.init_web_app();
+                logMessage('✅ Приложение инициализировано успешно!', 'success');
+            } catch (error) {
+                logMessage(`❌ Ошибка инициализации приложения: ${error.message}`, 'error');
+                console.error('Init app error:', error);
             }
         };
 

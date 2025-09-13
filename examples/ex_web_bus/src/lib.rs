@@ -27,8 +27,6 @@ pub fn init_web_app() -> Result<(), JsValue> {
 
 #[wasm_bindgen]
 pub fn send_task_update() -> String {
-    setup_log().unwrap();
-
     m_info!("send_task_update");
     match send_message_internal(TaskType::TaskUpdate) {
         Ok(_) => "Message sent successfully".to_string(),
@@ -38,6 +36,8 @@ pub fn send_task_update() -> String {
 
 #[wasm_bindgen]
 pub fn send_task_none() -> String {
+    m_info!("send_task_none");
+
     match send_message_internal(TaskType::TaskNone) {
         Ok(_) => "Message sent successfully".to_string(),
         Err(e) => format!("Error sending message: {}", e),
@@ -67,6 +67,7 @@ pub fn get_version() -> String {
 // Вспомогательная функция для отправки сообщений
 fn send_message_internal(message: TaskType) -> Result<(), String> {
     m_info!("send_message_internal");
+
     let bus = new_tokio_bus::<TaskType>(16);
     let sender = bus.get_sender();
 
@@ -76,7 +77,7 @@ fn send_message_internal(message: TaskType) -> Result<(), String> {
 }
 
 fn setup_log() -> Result<(), String> {
-    let mut c = AsnLogConfig {
+    let c = AsnLogConfig {
         global_level: AsnLogLevel::Trace,
         module_levels: Default::default(),
     };
