@@ -234,6 +234,6 @@ where
 ///
 /// let bus = new_tokio_bus::<Message>(16);
 /// ```
-pub fn new_tokio_bus<E: Clone + Send + Sync>(capacity: usize) -> impl AsnBus<E> {
+pub fn new_tokio_bus<E: Clone + Send + Sync>(capacity: usize) -> TokioEventBus<E> {
     TokioEventBus::new(capacity)
 }
