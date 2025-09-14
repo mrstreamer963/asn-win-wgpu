@@ -5,4 +5,6 @@
 
 * Исправить asn_log вызов функции инициализаци логов один раз через get_or_init
 
-* Заменить tokio на use futures::channel::mpsc ?
+* Заменить tokio на use futures::channel::mpsc ? - mpmc 
+
+Возможно реализовать mpsc реализовать для actor с почтовыми ящиками

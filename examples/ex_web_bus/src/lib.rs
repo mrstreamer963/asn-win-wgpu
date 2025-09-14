@@ -2,8 +2,8 @@ use asn_core_bus::{AsnBus, AsnReceiver, AsnTransmitter};
 use asn_logger::*;
 use wasm_bindgen::prelude::*;
 
+mod future_bus;
 mod setup_log;
-mod web_bus;
 use setup_log::setup_log;
 use web_bus::{TaskType, get_bus};
 
