@@ -2,10 +2,11 @@ use asn_core_bus::{AsnBus, AsnReceiver, AsnTransmitter};
 use asn_logger::*;
 use wasm_bindgen::prelude::*;
 
-mod future_bus;
 mod setup_log;
+mod web_bus;
+
 use setup_log::setup_log;
-use web_bus::{TaskType, get_bus};
+use web_bus::{TaskType, get_event_bus};
 
 const LOG_MODULE_NAME: &str = "ex_web_bus";
 
@@ -15,7 +16,7 @@ pub fn init_web_app() -> Result<(), JsValue> {
 
     m_info!("Hello from init_web_app");
 
-    let bus = get_bus();
+    let bus = get_event_bus();
     let sender = bus.get_sender();
     let mut receiver = bus.get_receiver();
 
@@ -36,7 +37,7 @@ pub fn init_web_app() -> Result<(), JsValue> {
 pub fn send_task_update() -> String {
     m_info!("send_task_update");
 
-    let s = get_bus().get_sender();
+    let s = get_event_bus().get_sender();
 
     match s.send_message(TaskType::TaskUpdate) {
         Ok(_) => "Message sent successfully".to_string(),
@@ -48,7 +49,7 @@ pub fn send_task_update() -> String {
 pub fn send_task_none() -> String {
     m_info!("send_task_none");
 
-    let s = get_bus().get_sender();
+    let s = get_event_bus().get_sender();
 
     match s.send_message(TaskType::TaskNone) {
         Ok(_) => "Message sent successfully".to_string(),
@@ -60,7 +61,7 @@ pub fn send_task_none() -> String {
 pub fn receive_message() -> String {
     m_info!("receive_message");
 
-    let bus = get_bus();
+    let bus = get_event_bus();
     let mut receiver = bus.get_receiver();
 
     match receiver.get_message() {
