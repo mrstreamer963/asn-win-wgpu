@@ -50,13 +50,6 @@ trunk serve
 trunk serve --port 8081
 ```
 
-Также можно использовать случайный свободный порт:
-```bash
-trunk serve --port 0
-```
-
-В этом случае trunk автоматически выберет случайный свободный порт и выведет его в консоль.
-
 ## Сборка
 
 Для сборки проекта выполните:
@@ -79,3 +72,31 @@ trunk build
 - **Получение сообщения** - получает сообщение из шины событий
 
 Все функции доступны через кнопки на веб-странице после инициализации WASM-модуля.
+
+
+Можно расширить как 
+
+```JavaScript
+export default function myInitializer () {
+  return {
+    onStart: () => {
+      // called when the loading starts
+    },
+    onProgress: ({current, total}) => {
+      // the progress while loading, will be called periodically.
+      // "current" will contain the number of bytes of the WASM already loaded
+      // "total" will either contain the total number of bytes expected for the WASM, or if the server did not provide
+      //   the content-length header it will contain 0.
+    },
+    onComplete: () => {
+      // called when the initialization is complete (successfully or failed)
+    },
+    onSuccess: (wasm) => {
+      // called when the initialization is completed successfully, receives the `wasm` instance
+    },
+    onFailure: (error) => {
+      // called when the initialization is completed with an error, receives the `error`
+    }
+  }
+};
+```
