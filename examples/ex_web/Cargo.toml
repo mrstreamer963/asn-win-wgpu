@@ -37,10 +37,6 @@ web-sys = { version = "0.3", features = [
     "WebGl2RenderingContext",
 ] }
 
-[dependencies.getrandom]
-version = "0.3"
-features = ["wasm_js"]
-
 [profile.dev]
 opt-level = 0
 debug = true
