@@ -7,6 +7,7 @@ edition = "2024"
 asn-wgpu = { path = "../../../modules/asn-wgpu" }
 bytemuck = { version = "1.23", features = ["derive"] }
 rand = "0.9"
+getrandom = { version = "0.3", features = ["wasm_js"] }
 anyhow = "1.0.98"
 asn-gui-core = { path = "../../../modules/asn-gui-core" }
 asn-core = { path = "../../../modules/asn-core" }
