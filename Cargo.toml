@@ -14,7 +14,7 @@ crate-type = ["cdylib", "rlib"]
 
 [workspace]
 resolver = "2"
-members = ["examples/ex_web_bus", "modules/async-channel-bus"]
+members = ["examples/ex_web_bus", "examples/ex_web_trunk", "modules/async-channel-bus"]
 
 [workspace.dependencies]
 tokio = { version = "1.47", features = ["full"] }
