@@ -158,7 +158,6 @@ dependencies = [
  "bytemuck",
  "image",
  "pollster",
- "rand",
  "thiserror 2.0.16",
  "web-time",
  "wgpu",
@@ -562,7 +561,6 @@ dependencies = [
  "asn-logger",
  "asn-wgpu",
  "asn-winit",
- "getrandom",
  "js-sys",
  "rand",
  "wasm-bindgen",
@@ -2298,6 +2296,7 @@ dependencies = [
  "asn-gui-core",
  "asn-wgpu",
  "bytemuck",
+ "getrandom",
  "image",
  "rand",
 ]
