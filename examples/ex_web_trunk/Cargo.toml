@@ -18,5 +18,19 @@ async-channel-bus = { path = "../../modules/async-channel-bus" }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
-web-sys = "0.3"
 async-channel = "2.5"
+asn-gui-core = { path = "../../modules/asn-gui-core" }
+asn-winit = { path = "../../modules/asn-winit" }
+asn-wgpu = { path = "../../modules/asn-wgpu" }
+wgpu-map = { path = "../../modules/gui-elements/wgpu-map" }
+web-sys = { version = "0.3", features = [
+    "console",
+    "Document",
+    "Element",
+    "HtmlElement",
+    "HtmlCanvasElement",
+    "Node",
+    "Window",
+    "WebGlRenderingContext",
+    "WebGl2RenderingContext",
+] }
