@@ -644,21 +644,6 @@ version = "0.1.0"
 dependencies = [
  "asn-core",
  "asn-core-bus",
- "asn-logger",
- "async-channel",
- "async-channel-bus",
- "js-sys",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
-name = "ex_web_trunk"
-version = "0.1.0"
-dependencies = [
- "asn-core",
- "asn-core-bus",
  "asn-gui-core",
  "asn-logger",
  "asn-wgpu",

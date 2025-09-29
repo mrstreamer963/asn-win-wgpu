@@ -100,3 +100,14 @@ export default function myInitializer () {
   }
 };
 ```
+
+Для корректной сборки либы getrandom приходится не только прописывать у нее features = ["wasm_js"], 
+но и явно прописывать в файле ./cargo/config.toml
+
+```sh
+[build]
+rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]
+```
+
+Типа указывая фичу мы включаем эту возможность в коде, а указывая флаг - говорить явно использовать ее *facepalm*
+Типа для "более тонкой настройки и 

@@ -16,6 +16,10 @@ pub fn init_web_app() -> Result<(), JsValue> {
 
     m_info!("Hello from init_web_app");
 
+    // Получаем информацию о памяти
+    let memory_info = get_memory_usage();
+    m_info!("{}", memory_info);
+
     let bus = get_event_bus();
     let sender = bus.get_sender();
     let mut receiver = bus.get_receiver();
@@ -55,6 +59,24 @@ pub fn send_task_none() -> String {
         Ok(_) => "Message sent successfully".to_string(),
         Err(e) => format!("Error sending message: {:?}", e),
     }
+}
+
+#[wasm_bindgen]
+pub fn get_memory_usage() -> String {
+    // Получаем информацию о памяти из WebAssembly
+    let memory = wasm_bindgen::memory();
+    let js_memory: js_sys::WebAssembly::Memory = memory.into();
+    let buffer = js_memory.buffer();
+
+    // Получаем размер буфера в байтах
+    let memory_size = js_sys::Reflect::get(&buffer, &"byteLength".into())
+        .map(|v| v.as_f64().unwrap_or(0.0) as u32)
+        .unwrap_or(0);
+
+    // Конвертируем в килобайты
+    let memory_kb = memory_size / 1024;
+
+    format!("Memory usage: {} KB", memory_kb)
 }
 
 #[wasm_bindgen]

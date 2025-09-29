@@ -147,6 +147,7 @@
             <h3>Основные функции</h3>
             <button onclick="initApp()">Инициализировать приложение</button>
             <button onclick="getVersion()">Получить версию</button>
+            <button onclick="getMemoryUsage()">Получить использование памяти</button>
         </div>
 
         <div class="button-group">
@@ -215,7 +216,8 @@
                 typeof window.wasmBindings.get_version === 'undefined' ||
                 typeof window.wasmBindings.send_task_update === 'undefined' ||
                 typeof window.wasmBindings.send_task_none === 'undefined' ||
-                typeof window.wasmBindings.receive_message === 'undefined') {
+                typeof window.wasmBindings.receive_message === 'undefined' ||
+                typeof window.wasmBindings.get_memory_usage === 'undefined') {
                 logMessage('❌ Не все функции WASM-модуля доступны', 'error');
                 updateStatus('error', 'Ошибка загрузки');
                 return;
@@ -301,6 +303,21 @@
             } catch (error) {
                 logMessage(`❌ Ошибка инициализации приложения: ${error.message}`, 'error');
                 console.error('Init app error:', error);
+            }
+        };
+
+        window.getMemoryUsage = function () {
+            if (!wasmInitialized) {
+                logMessage('❌ WASM модуль не инициализирован', 'error');
+                return;
+            }
+
+            try {
+                const result = window.wasmBindings.get_memory_usage();
+                logMessage(`🧠 ${result}`, 'info');
+            } catch (error) {
+                logMessage(`❌ Ошибка получения информации о памяти: ${error.message}`, 'error');
+                console.error('Get memory usage error:', error);
             }
         };
 
