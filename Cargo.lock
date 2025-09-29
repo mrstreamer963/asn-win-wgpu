@@ -2398,6 +2398,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "web_trunk"
+version = "0.1.0"
+dependencies = [
+ "asn-core",
+ "asn-core-bus",
+ "asn-gui-core",
+ "asn-logger",
+ "asn-wgpu",
+ "asn-winit",
+ "async-channel",
+ "async-channel-bus",
+ "js-sys",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "wgpu-map",
+]
+
+[[package]]
 name = "wgpu"
 version = "26.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
