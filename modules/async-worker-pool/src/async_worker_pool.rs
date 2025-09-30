@@ -1,7 +1,7 @@
 extern crate asn_core_bus;
 
 use asn_core_bus::AsnWorkerPool;
-use async_channel::{Receiver, Sender};
+use async_channel::Sender;
 use std::sync::Arc;
 use std::thread;
 
