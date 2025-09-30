@@ -2,8 +2,9 @@ mod log_utils;
 
 use asn_core_bus::{AsnBus, AsnReceiver, AsnTransmitter};
 use asn_logger::m_info;
+use async_channel_bus;
+use async_channel_bus::new_bus as new_async_bus;
 use log_utils::setup_log;
-use tokio_bus::new_tokio_bus;
 
 pub const LOG_MODULE_NAME: &str = file!();
 
@@ -19,7 +20,7 @@ fn main() {
 
     m_info!("Hello from module");
 
-    let bus = new_tokio_bus::<TaskType>(16);
+    let bus = new_async_bus::<TaskType>(16);
 
     let mut recv = bus.get_receiver();
     let send = bus.get_sender();

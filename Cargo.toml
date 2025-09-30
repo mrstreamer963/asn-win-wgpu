@@ -14,16 +14,14 @@ crate-type = ["cdylib", "rlib"]
 
 [workspace]
 resolver = "2"
-members = ["examples/ex_web_bus", "examples/web_trunk", "modules/async-channel-bus"]
-
-[workspace.dependencies]
-tokio = { version = "1.47", features = ["full"] }
+members = ["examples/ex_web_bus", "examples/web_trunk", "modules/async-channel-bus", "modules/async-worker-pool"]
 
 [dependencies]
 asn-logger = { git = "https://github.com/amberskynet/asn-logger.git", version = "3.1.0", features = [] }
 asn-core = { path = "./modules/asn-core" }
 asn-core-bus = { path = "./modules/asn-core-bus" }
 asn-gui-core = { path = "./modules/asn-gui-core" }
+async-channel-bus = { path = "./modules/async-channel-bus" }
 # Убираем проблемные модули из WASM сборки
 # asn-wgpu = { path = "./modules/asn-wgpu" }
 # asn-winit = { path = "./modules/asn-winit" }
@@ -48,7 +46,6 @@ web-sys = { version = "0.3", features = [
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 rand = "0.9"
-tokio-bus = { path = "./modules/tokio-bus"}
 asn-wgpu = { path = "./modules/asn-wgpu" }
 asn-winit = { path = "./modules/asn-winit" }
 wgpu-map = { path = "./modules/gui-elements/wgpu-map" }
