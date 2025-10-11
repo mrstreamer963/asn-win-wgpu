@@ -24,7 +24,7 @@ impl AsyncWorkerPool {
             let receiver = receiver.clone();
             let handle = thread::spawn(move || {
                 loop {
-                    match receiver.recv_blocking() {
+                    match futures::executor::block_on(receiver.recv()) {
                         Ok(job) => {
                             job();
                         }
