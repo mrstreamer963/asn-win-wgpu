@@ -2289,6 +2289,7 @@ dependencies = [
  "asn-winit",
  "async-channel",
  "async-channel-bus",
+ "async-worker-pool",
  "js-sys",
  "wasm-bindgen",
  "wasm-bindgen-futures",
