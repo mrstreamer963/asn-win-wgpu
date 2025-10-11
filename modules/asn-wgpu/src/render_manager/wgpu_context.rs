@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use asn_logger::*;
 use asn_winit::WinitWindow;
+use wgpu::ExperimentalFeatures;
 
 use crate::{
     StateError,
@@ -70,6 +71,7 @@ impl WgpuGraphContext {
                 },
                 memory_hints: Default::default(),
                 trace: wgpu::Trace::Off,
+                experimental_features: ExperimentalFeatures::disabled(),
             })
             .await
             .map_err(|e| StateError::DeviceCreation(e.to_string()))?;
