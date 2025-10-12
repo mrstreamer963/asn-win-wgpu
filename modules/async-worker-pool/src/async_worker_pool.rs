@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::thread;
 
 // Define the Job type as a boxed function
-pub type Job = Box<dyn FnOnce() + Send>;
+pub type Job = Box<dyn FnOnce() + Send + 'static>;
 
 pub struct AsyncWorkerPool {
     sender: Option<Sender<Job>>,
@@ -45,15 +45,10 @@ impl AsyncWorkerPool {
     }
 }
 
-impl<F> AsnWorkerPool<F> for AsyncWorkerPool
-where
-    F: FnOnce() + Send + 'static,
-{
-    fn run_main_thread(&self, func: F) -> Result<(), String> {
+impl AsnWorkerPool for AsyncWorkerPool {
+    fn run_main_thread(&self, func: impl FnOnce() + Send + 'static) -> Result<(), String> {
         if let Some(sender) = &self.sender {
-            let job: Job = Box::new(move || {
-                func();
-            });
+            let job: Job = Box::new(func);
             match sender.try_send(job) {
                 Ok(()) => Ok(()),
                 Err(_) => Err("Failed to send job to worker pool".to_string()),
@@ -63,11 +58,9 @@ where
         }
     }
 
-    fn run_thread(&self, func: F) -> Result<(), String> {
+    fn run_thread(&self, func: impl FnOnce() + Send + 'static) -> Result<(), String> {
         if let Some(sender) = &self.sender {
-            let job: Job = Box::new(move || {
-                func();
-            });
+            let job: Job = Box::new(func);
             match sender.try_send(job) {
                 Ok(()) => Ok(()),
                 Err(_) => Err("Failed to send job to worker pool".to_string()),
@@ -92,6 +85,6 @@ impl Drop for AsyncWorkerPool {
     }
 }
 
-pub fn new_async_pool<F: FnOnce() + Send + 'static>(size: usize) -> impl AsnWorkerPool<F> {
+pub fn new_async_pool(size: usize) -> impl AsnWorkerPool {
     AsyncWorkerPool::new(size)
 }
