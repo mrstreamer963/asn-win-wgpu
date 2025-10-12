@@ -47,18 +47,13 @@ impl AsyncWorkerPool {
 
 impl AsnWorkerPool for AsyncWorkerPool {
     fn run_main_thread(&self, func: impl FnOnce() + Send + 'static) -> Result<(), String> {
-        if let Some(sender) = &self.sender {
-            let job: Job = Box::new(func);
-            match sender.try_send(job) {
-                Ok(()) => Ok(()),
-                Err(_) => Err("Failed to send job to worker pool".to_string()),
-            }
-        } else {
-            Err("Worker pool sender closed".to_string())
-        }
+        // Execute the function directly in the current (main) thread
+        func();
+        Ok(())
     }
 
     fn run_thread(&self, func: impl FnOnce() + Send + 'static) -> Result<(), String> {
+        // Execute the function in a worker thread from the pool
         if let Some(sender) = &self.sender {
             let job: Job = Box::new(func);
             match sender.try_send(job) {
