@@ -30,12 +30,16 @@ impl WgpuGraphContext {
         // }
 
         // Create GPU instance
-        let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
+        // wgpu 29: Instance::new takes descriptor by value, not by reference
+        let instance = wgpu::Instance::new(wgpu::InstanceDescriptor {
             #[cfg(not(target_arch = "wasm32"))]
             backends: wgpu::Backends::PRIMARY,
             #[cfg(target_arch = "wasm32")]
             backends: wgpu::Backends::GL,
-            ..Default::default()
+            flags: wgpu::InstanceFlags::default(),
+            memory_budget_thresholds: wgpu::MemoryBudgetThresholds::default(),
+            backend_options: wgpu::BackendOptions::default(),
+            display: None,
         });
 
         m_trace!("instance ok");

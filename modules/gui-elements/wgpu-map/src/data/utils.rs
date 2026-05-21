@@ -10,8 +10,10 @@ pub fn get_render_pipeline(
 ) -> wgpu::RenderPipeline {
     let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
         label: Some("Map Render Pipeline Layout"),
-        bind_group_layouts: &[&texture_bind_group_layout],
-        push_constant_ranges: &[],
+        // wgpu 29: bind_group_layouts is &[Option<&BindGroupLayout>]
+        bind_group_layouts: &[Some(&texture_bind_group_layout)],
+        // wgpu 29: push_constant_ranges removed, immediate_size added
+        immediate_size: 0,
     });
 
     let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -48,7 +50,8 @@ pub fn get_render_pipeline(
             mask: !0,
             alpha_to_coverage_enabled: false,
         },
-        multiview: None,
+        // wgpu 29: multiview renamed to multiview_mask
+        multiview_mask: None,
         cache: None,
     });
 

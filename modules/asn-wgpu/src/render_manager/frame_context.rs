@@ -14,9 +14,27 @@ impl WgpuFrameContext {
         surface: &wgpu::Surface<'static>,
         device: &wgpu::Device,
     ) -> Result<WgpuFrameContext, StateError> {
-        let output = surface
-            .get_current_texture()
-            .map_err(|e| StateError::TextureError(e.to_string()))?;
+        // wgpu 29: get_current_texture returns CurrentSurfaceTexture enum
+        let output = match surface.get_current_texture() {
+            wgpu::CurrentSurfaceTexture::Success(frame) => frame,
+            wgpu::CurrentSurfaceTexture::Timeout | wgpu::CurrentSurfaceTexture::Occluded => {
+                return Err(StateError::TextureError(
+                    "Surface timeout or occluded".to_string(),
+                ));
+            }
+            wgpu::CurrentSurfaceTexture::Outdated
+            | wgpu::CurrentSurfaceTexture::Suboptimal(_)
+            | wgpu::CurrentSurfaceTexture::Lost => {
+                return Err(StateError::TextureError(
+                    "Surface outdated, suboptimal, or lost".to_string(),
+                ));
+            }
+            wgpu::CurrentSurfaceTexture::Validation => {
+                return Err(StateError::TextureError(
+                    "Surface validation error".to_string(),
+                ));
+            }
+        };
 
         let view = output
             .texture

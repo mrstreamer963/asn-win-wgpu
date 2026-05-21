@@ -29,6 +29,15 @@ async-channel-bus = { path = "./modules/async-channel-bus" }
 pollster = "0.4"
 
 [dev-dependencies]
+
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+rand = "0.9"
+asn-wgpu = { path = "./modules/asn-wgpu" }
+asn-winit = { path = "./modules/asn-winit" }
+wgpu-map = { path = "./modules/gui-elements/wgpu-map" }
+
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
@@ -42,13 +51,6 @@ web-sys = { version = "0.3", features = [
     "WebGlRenderingContext",
     "WebGl2RenderingContext",
 ] }
-
-
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-rand = "0.9"
-asn-wgpu = { path = "./modules/asn-wgpu" }
-asn-winit = { path = "./modules/asn-winit" }
-wgpu-map = { path = "./modules/gui-elements/wgpu-map" }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "0.2"

@@ -83,6 +83,8 @@ impl TAsnGuiElement for WgpuMap {
             depth_stencil_attachment: None,
             occlusion_query_set: None,
             timestamp_writes: None,
+            // wgpu 29: new required field
+            multiview_mask: None,
         });
 
         render_pass.set_pipeline(&self.render_pipeline);
