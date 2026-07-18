@@ -24,7 +24,7 @@ wgpu-map = { path = "../../modules/gui-elements/wgpu-map" }
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4"
 js-sys = "0.3"
-rand = "0.9"
+rand = "0.10"
 web-sys = { version = "0.3", features = [
     "console",
     "Document",

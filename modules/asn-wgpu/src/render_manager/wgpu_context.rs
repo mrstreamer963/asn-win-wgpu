@@ -56,6 +56,7 @@ impl WgpuGraphContext {
                 power_preference: wgpu::PowerPreference::default(),
                 compatible_surface: Some(&surface),
                 force_fallback_adapter: false,
+                apply_limit_buckets: false,
             })
             .await
             .map_err(|_| StateError::NoAdapter)?;
@@ -104,6 +105,7 @@ impl WgpuGraphContext {
         let config = wgpu::SurfaceConfiguration {
             usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
             format: surface_format,
+            color_space: wgpu::SurfaceColorSpace::Auto,
             width,
             height,
             present_mode: surface_caps

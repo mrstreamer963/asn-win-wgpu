@@ -26,13 +26,13 @@ async-channel-bus = { path = "./modules/async-channel-bus" }
 # asn-wgpu = { path = "./modules/asn-wgpu" }
 # asn-winit = { path = "./modules/asn-winit" }
 # wgpu-map = { path = "./modules/gui-elements/wgpu-map" }
-pollster = "0.4"
+pollster = "1.0"
 
 [dev-dependencies]
 
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-rand = "0.9"
+rand = "0.10"
 asn-wgpu = { path = "./modules/asn-wgpu" }
 asn-winit = { path = "./modules/asn-winit" }
 wgpu-map = { path = "./modules/gui-elements/wgpu-map" }

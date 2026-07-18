@@ -1,5 +1,5 @@
 #[cfg(not(target_arch = "wasm32"))]
-use rand::Rng;
+use rand::RngExt;
 
 /// Класс для инициализации и обработки RGBA-массивов
 ///

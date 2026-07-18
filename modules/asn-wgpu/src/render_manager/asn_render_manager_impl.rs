@@ -102,7 +102,7 @@ where
 
         // Отправляем команды рендеринга и выводим кадр на экран
         s.queue.submit(std::iter::once(fcx.encoder.finish()));
-        fcx.output.present();
+        s.queue.present(fcx.output);
 
         // Обновляем статистику рендеринга
         let frame_duration = fcx.frame_start.elapsed();

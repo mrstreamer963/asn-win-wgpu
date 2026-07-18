@@ -1,4 +1,4 @@
-use rand::Rng;
+use rand::RngExt;
 
 /// Генерирует случайную карту размером map_width x map_height с индексами тайлов от 0 до tiles_width * tiles_height - 1
 pub fn generate_random_map(map_width: u32, map_height: u32, max_tile_index: u32) -> Vec<u32> {
