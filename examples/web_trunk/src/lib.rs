@@ -1,4 +1,4 @@
-use asn_core_bus::{AsnBus, AsnReceiver, AsnTransmitter};
+use asn_core_bus::{AsnBus, AsnReceiver, AsnTransmitter, AsnWorkerPool};
 use asn_logger::*;
 use wasm_bindgen::prelude::*;
 
@@ -6,7 +6,7 @@ mod module_pool;
 mod setup_log;
 mod web_bus;
 
-use module_pool::get_worker_pool;
+use module_pool::new_worker_pool;
 use setup_log::setup_log;
 
 use web_bus::{TaskType, get_event_bus};
@@ -27,7 +27,7 @@ pub fn init_web_app() -> Result<(), JsValue> {
     let sender = bus.get_sender();
     let mut receiver = bus.get_receiver();
 
-    let worker_pool = get_worker_pool();
+    let worker_pool = new_worker_pool();
     worker_pool
         .run_main_thread(|| {
             m_info!("Worker pool running");
